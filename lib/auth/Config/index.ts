@@ -2,6 +2,11 @@ export const LOGIN = '/auth-test'
 export const REFRESH_TOKEN = `${process.env.NEXT_PUBLIC_API_URL}/refresh`
 export const PROFILE = '/me'
 
+export const REFRESH_BUFFER = 30
+export const ACCESS_COOKIE = 'accessToken'
+export const REFRESH_COOKIE = 'refreshToken'
+export const HASAUTH_COOKIE = 'hasAuth'
+
 export const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID
 export const GITHUB_CLIENT_ID = process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID
 

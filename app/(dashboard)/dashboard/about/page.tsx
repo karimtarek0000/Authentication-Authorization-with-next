@@ -12,17 +12,18 @@ interface Data {
 }
 
 export default async function Page() {
-  const data = await apiServer.get<Data>('/data')
+  //   const data = await apiServer.get<Data>('/data')
 
   return (
     <>
-      <h1>{data.data.userId}</h1>
+      <h1>About page</h1>
+      <Link href="/dashboard">Go to Dashboard Page</Link>
+      {/* <h1>{data.data.userId}</h1>
       <h1>{data.data.name}</h1>
       <h1>{data.data.course}</h1>
       <br />
       <Profile />
-      <Data />
-      <Link href="/dashboard/about">Go to About Page</Link>
+      <Data /> */}
     </>
   )
 }

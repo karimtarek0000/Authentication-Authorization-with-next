@@ -1,25 +1,18 @@
-import { authService } from '@/lib/auth'
-import type { NextRequest } from 'next/server'
+import { authService, isExpired } from '@/lib/auth'
+import { NextResponse, type NextRequest } from 'next/server'
 
 export async function proxy(req: NextRequest) {
-  const refreshToken = req.cookies.get('refreshToken')?.value
+  if (req.headers.has('next-router-prefetch')) return NextResponse.next()
 
-  const newAccessToken = await authService.refreshToken(refreshToken)
+  const { accessToken, hasAuth, refreshToken } = await authService.checkCookies(req)
 
-  // const h = new Headers(req.headers)
-  // h.set('cookie', `${req.headers.get('cookie')}; accessToken=${newToken}`)
-  // h.set('x-access-token', newToken) // الـ layout هياخده من هنا
-  // const res = NextResponse.next({ request: { headers: h } })
-  // res.cookies.set('accessToken', newToken, { httpOnly: true, path: '/' })
-  // return res
+  if (!isExpired(accessToken) || !hasAuth || !refreshToken) {
+    return NextResponse.next()
+  }
+
+  authService.restoreSessionToken(req, refreshToken)
 }
 
 export const config = {
   matcher: ['/dashboard/:path*', '/auth/:path*'],
 }
-
-// await refreshToken()
-// console.log('middleware')
-// const headers = new Headers(request.headers)
-// headers.set('x-access-token', accessToken)
-//   return NextResponse.redirect(new URL('/home', request.url))

@@ -37,7 +37,7 @@ async function apiFetch<T>(
     signal: controller.signal,
     headers: {
       'Content-Type': 'application/json',
-      ...(authService.accessToken && { Authorization: `Bearer ${authService.accessToken}` }),
+      // Authorization: `Bearer ${authService.accessToken}`,
       ...opts.headers,
     },
   })
