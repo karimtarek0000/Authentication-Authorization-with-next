@@ -1,10 +1,7 @@
 'use client'
 
-import { api, AuthState, ILogin, ILoginResponse, REFRESH_TOKEN, setCookie } from '@/lib/auth'
+import { api, authService, AuthState, ILogin, ILoginResponse, setCookie } from '@/lib/auth'
 import { useCallback, useState } from 'react'
-
-// const restorePromise: Promise<Login | null> | null = null
-const refreshPromise: Promise<string | undefined> | null = null
 
 const initialAuthState: AuthState = {
   accessToken: '',
@@ -12,28 +9,6 @@ const initialAuthState: AuthState = {
   permissions: [],
   role: '',
   isAuth: false,
-}
-
-export const authService = {
-  accessToken: '',
-
-  async refreshToken() {
-    try {
-      const response = await fetch(REFRESH_TOKEN, {
-        method: 'POST',
-        credentials: 'include',
-        cache: 'no-store',
-      })
-
-      if (!response.ok) throw new Error('There are an error')
-      const data = await response.json()
-
-      this.accessToken = data.accessToken
-      return data.accessToken
-    } catch (error) {
-      console.log(error)
-    }
-  },
 }
 
 export const useAuthService = (initialToken: string | null) => {
