@@ -1,7 +1,6 @@
 'use client'
 
 import { useAuthActions } from '@/lib/auth'
-import { login } from '@/lib/auth/Actions'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 

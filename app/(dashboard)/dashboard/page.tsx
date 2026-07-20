@@ -1,3 +1,4 @@
+import Profile from '@/components/auth/Profile'
 import { api } from '@/lib/auth/Call'
 
 interface Data {
@@ -14,6 +15,8 @@ export default async function Page() {
     <>
       <h1>{data.data.name}</h1>
       <h1>{data.data.course}</h1>
+      <br />
+      <Profile />
     </>
   )
 }

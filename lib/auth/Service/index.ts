@@ -1,7 +1,10 @@
 'use client'
 
-import { api, AuthState, ILogin, ILoginResponse, setCookie } from '@/lib/auth'
-import { useState } from 'react'
+import { api, AuthState, ILogin, ILoginResponse, REFRESH_TOKEN, setCookie } from '@/lib/auth'
+import { useCallback, useState } from 'react'
+
+// const restorePromise: Promise<Login | null> | null = null
+let refreshPromise: Promise<string | undefined> | null = null
 
 const initialAuthState: AuthState = {
   accessToken: '',
@@ -9,6 +12,34 @@ const initialAuthState: AuthState = {
   permissions: [],
   role: '',
   isAuth: false,
+}
+
+export const authService = {
+  async refreshToken() {
+    if (refreshPromise) return refreshPromise
+
+    refreshPromise = (async () => {
+      try {
+        const response = await fetch(REFRESH_TOKEN, {
+          method: 'POST',
+          credentials: 'include',
+          cache: 'no-store',
+        })
+
+        if (!response.ok) throw new Error('Error')
+
+        const data = await response.json()
+
+        return data.accessToken
+      } catch (error) {
+        console.log(error)
+      } finally {
+        refreshPromise = null
+      }
+    })()
+
+    return refreshPromise
+  },
 }
 
 export const useAuthService = (initialToken: string | null) => {
@@ -43,6 +74,9 @@ export const useAuthService = (initialToken: string | null) => {
       throw error
     }
   }
+
+  // =================== Restore Session Functions ===================
+  const refreshToken = useCallback(() => {}, [])
 
   return { login, userAuth }
 }

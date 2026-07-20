@@ -33,6 +33,13 @@ export type AuthState = {
   isAuth: boolean
 }
 
+export type AuthActions = {
+  login: ({ email, password }: ILogin) => Promise<ILoginResponse>
+  // refreshToken: () => Promise<string | undefined>
+  // loginWithOAuth: (provider: OAuthProvider, code: string) => Promise<void>
+  // logout: () => void
+}
+
 // ================= SYNC =================
 export type AuthEvent = 'logout'
 
