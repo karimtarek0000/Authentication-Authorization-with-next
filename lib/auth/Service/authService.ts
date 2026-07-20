@@ -41,6 +41,8 @@ export const authService = {
       // Send to layout
       // headers.set('x-access-token', newAccessToken)
 
+      console.log(newAccessToken)
+
       const res = NextResponse.next({ request: { headers } })
 
       res.cookies.set(ACCESS_COOKIE, newAccessToken, {

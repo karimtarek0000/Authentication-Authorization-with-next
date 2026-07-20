@@ -1,14 +1,6 @@
 'use client'
 
-import {
-  api,
-  authService,
-  AuthState,
-  ILogin,
-  ILoginResponse,
-  REFRESH_TOKEN,
-  setCookie,
-} from '@/lib/auth'
+import { api, authService, AuthState, ILogin, ILoginResponse, setCookie } from '@/lib/auth'
 import { useCallback, useState } from 'react'
 
 const initialAuthState: AuthState = {
@@ -37,13 +29,12 @@ export const useAuthService = (initialToken: string | null) => {
       role,
       isAuth: true,
     })
-
-    setCookie('hasAuth', 'true')
   }
 
   const login = async ({ email, password }: ILogin) => {
     try {
       const data = await api.post<ILoginResponse>('/auth-test', { email, password })
+      await setCookie('hasAuth', 'true')
       authService.accessToken = data.accessToken
       setAuthData(data)
       return data

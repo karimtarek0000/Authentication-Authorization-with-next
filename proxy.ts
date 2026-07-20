@@ -2,7 +2,7 @@ import { authService, isExpired, redirectToLogin } from '@/lib/auth'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function proxy(req: NextRequest) {
-  // if (req.headers.has('next-router-prefetch')) return NextResponse.next()
+  if (req.headers.has('next-router-prefetch')) return NextResponse.next()
 
   const { accessToken, hasAuth, refreshToken } = await authService.checkCookies(req)
 
