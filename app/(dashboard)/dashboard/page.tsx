@@ -1,6 +1,7 @@
 import Profile from '@/components/auth/Profile'
 import Data from '@/components/dashboard/Data'
 import { api } from '@/lib/auth'
+import { apiServer } from '@/lib/auth/Call'
 
 interface Data {
   data: {
@@ -11,13 +12,13 @@ interface Data {
 }
 
 export default async function Page() {
-  // const data = await api.get<Data>('/data')
+  const data = await apiServer.get<Data>('/data')
 
   return (
     <>
-      {/* <h1>{data.data.userId}</h1>
+      <h1>{data.data.userId}</h1>
       <h1>{data.data.name}</h1>
-      <h1>{data.data.course}</h1> */}
+      <h1>{data.data.course}</h1>
       <br />
       <Profile />
       <Data />

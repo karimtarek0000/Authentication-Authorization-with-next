@@ -3,14 +3,15 @@ import { cookies, headers } from 'next/headers'
 export async function serverFetch<T>(path: string, opts: RequestInit = {}) {
   const h = await headers()
   const c = await cookies()
-  const token = h.get('x-access-token') ?? c.get('accessToken')?.value
+  const accessToken = h.get('x-access-token') ?? c.get('accessToken')?.value
 
-  const res = await fetch(process.env.NEXT_PUBLIC_API_BASE_URL! + path, {
+  const res = await fetch(process.env.NEXT_PUBLIC_API_URL + path, {
     ...opts,
     headers: {
       'Content-Type': 'application/json',
-      ...(token && { Authorization: `Bearer ${token}` }),
+      Authorization: `Bearer ${accessToken}`,
       ...opts.headers,
+      Cookie: `accessToken=${accessToken}`,
     },
   })
   if (!res.ok) throw Object.assign(new Error(res.statusText), { status: res.status })
