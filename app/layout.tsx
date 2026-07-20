@@ -24,14 +24,11 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  const h = await headers()
-  const token = h.get('x-access-token')
-
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
-      <AuthProvider initialToken={token}>
-        <body className="min-h-full flex flex-col">{children}</body>
-      </AuthProvider>
+      <body className="min-h-full flex flex-col">
+        <AuthProvider>{children}</AuthProvider>
+      </body>
     </html>
   )
 }

@@ -1,7 +1,16 @@
 'use client'
 
-import { api, authService, AuthState, ILogin, ILoginResponse, setCookie } from '@/lib/auth'
-import { useCallback, useState } from 'react'
+import {
+  api,
+  authService,
+  AuthState,
+  ILogin,
+  ILoginResponse,
+  setCookie,
+  userLogout,
+} from '@/lib/auth'
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
 
 const initialAuthState: AuthState = {
   accessToken: '',
@@ -12,9 +21,8 @@ const initialAuthState: AuthState = {
 }
 
 export const useAuthService = () => {
-  //   const [isLoading, setLoading] = useState()
-  //   const [accessToken, setAccessToken] = useState()
   const [userAuth, setUserAuth] = useState<AuthState>(initialAuthState)
+  const { replace } = useRouter()
 
   const setAuthData = (data: any) => {
     const { id, name, permissions, role, accessToken } = data
@@ -40,8 +48,10 @@ export const useAuthService = () => {
     }
   }
 
-  // =================== Restore Session Functions ===================
-  const refreshToken = useCallback(() => {}, [])
+  const logout = async () => {
+    await userLogout()
+    replace('/auth')
+  }
 
-  return { login, userAuth }
+  return { login, logout, userAuth }
 }

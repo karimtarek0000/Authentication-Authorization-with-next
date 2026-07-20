@@ -9,8 +9,10 @@ import {
 import { NextRequest, NextResponse } from 'next/server'
 
 export const authService = {
-  accessToken: '',
-
+  accessToken() {
+    if (typeof document === 'undefined') return null
+    return document.cookie.match(/(?:^|;\s*)accessToken=([^;]*)/)?.[1] ?? null
+  },
   async refreshToken(refreshToken?: string) {
     try {
       const headers = refreshToken ? { Cookie: `refreshToken=${refreshToken}` } : undefined

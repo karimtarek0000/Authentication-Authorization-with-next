@@ -22,7 +22,6 @@ export interface ILoginResponse {
 // ================= CONTEXT_API =================
 export type AuthProviderProps = {
   children: ReactNode
-  initialToken: string | null
 }
 
 export type AuthState = {
@@ -35,9 +34,8 @@ export type AuthState = {
 
 export type AuthActions = {
   login: ({ email, password }: ILogin) => Promise<ILoginResponse>
-  // refreshToken: () => Promise<string | undefined>
+  logout: () => Promise<void>
   // loginWithOAuth: (provider: OAuthProvider, code: string) => Promise<void>
-  // logout: () => void
 }
 
 // ================= SYNC =================

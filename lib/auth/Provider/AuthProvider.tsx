@@ -8,18 +8,14 @@ import {
   AuthStateContext,
   useAuthService,
 } from '@/lib/auth'
-import { useEffect, useMemo } from 'react'
+import { useMemo } from 'react'
 
-export function AuthProvider({ initialToken, children }: AuthProviderProps) {
-  const { login, userAuth } = useAuthService()
+export function AuthProvider({ children }: AuthProviderProps) {
+  const { login, logout, userAuth } = useAuthService()
 
-  const actions = useMemo<AuthActions>(() => ({ login }), [login])
+  const actions = useMemo<AuthActions>(() => ({ login, logout }), [login, logout])
 
-  useEffect(() => {
-    if (initialToken !== null) {
-      authService.accessToken = initialToken!
-    }
-  }, [initialToken])
+  console.log(authService.accessToken)
 
   return (
     <AuthStateContext.Provider value={userAuth}>

@@ -1,6 +1,7 @@
 'use server'
 
 import { cookies } from 'next/headers'
+import { ACCESS_COOKIE, HASAUTH_COOKIE, REFRESH_COOKIE } from '../Config'
 
 export const setCookie = async (name: string, value: string) => {
   const cookie = await cookies()
@@ -10,4 +11,11 @@ export const setCookie = async (name: string, value: string) => {
 export const getCookie = async (name: string) => {
   const cookie = await cookies()
   return cookie.get(name)?.value
+}
+
+export const userLogout = async () => {
+  const cookie = await cookies()
+  cookie.delete(ACCESS_COOKIE)
+  cookie.delete(REFRESH_COOKIE)
+  cookie.delete(HASAUTH_COOKIE)
 }
