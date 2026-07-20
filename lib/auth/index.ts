@@ -1,5 +1,5 @@
 export * from './Actions'
-export * from './Call'
+export * from './Call/client'
 export * from './Config'
 export * from './Provider'
 export * from './Service'

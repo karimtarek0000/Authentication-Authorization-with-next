@@ -4,7 +4,7 @@ import { api, AuthState, ILogin, ILoginResponse, REFRESH_TOKEN, setCookie } from
 import { useCallback, useState } from 'react'
 
 // const restorePromise: Promise<Login | null> | null = null
-let refreshPromise: Promise<string | undefined> | null = null
+const refreshPromise: Promise<string | undefined> | null = null
 
 const initialAuthState: AuthState = {
   accessToken: '',
@@ -15,30 +15,24 @@ const initialAuthState: AuthState = {
 }
 
 export const authService = {
+  accessToken: '',
+
   async refreshToken() {
-    if (refreshPromise) return refreshPromise
+    try {
+      const response = await fetch(REFRESH_TOKEN, {
+        method: 'POST',
+        credentials: 'include',
+        cache: 'no-store',
+      })
 
-    refreshPromise = (async () => {
-      try {
-        const response = await fetch(REFRESH_TOKEN, {
-          method: 'POST',
-          credentials: 'include',
-          cache: 'no-store',
-        })
+      if (!response.ok) throw new Error('There are an error')
+      const data = await response.json()
 
-        if (!response.ok) throw new Error('Error')
-
-        const data = await response.json()
-
-        return data.accessToken
-      } catch (error) {
-        console.log(error)
-      } finally {
-        refreshPromise = null
-      }
-    })()
-
-    return refreshPromise
+      this.accessToken = data.accessToken
+      return data.accessToken
+    } catch (error) {
+      console.log(error)
+    }
   },
 }
 
@@ -67,7 +61,7 @@ export const useAuthService = (initialToken: string | null) => {
   const login = async ({ email, password }: ILogin) => {
     try {
       const data = await api.post<ILoginResponse>('/auth-test', { email, password })
-
+      authService.accessToken = data.accessToken
       setAuthData(data)
       return data
     } catch (error) {
