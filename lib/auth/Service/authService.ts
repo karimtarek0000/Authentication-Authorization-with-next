@@ -1,6 +1,7 @@
 import {
   ACCESS_COOKIE,
   HASAUTH_COOKIE,
+  redirectToLogin,
   REFRESH_COOKIE,
   REFRESH_TOKEN,
   replaceCookie,
@@ -36,7 +37,9 @@ export const authService = {
 
       const headers = new Headers(req.headers)
       headers.set('cookie', replaceCookie(req.headers.get('cookie'), ACCESS_COOKIE, newAccessToken))
-      headers.set('x-access-token', newAccessToken)
+
+      // Send to layout
+      // headers.set('x-access-token', newAccessToken)
 
       const res = NextResponse.next({ request: { headers } })
 
@@ -49,11 +52,7 @@ export const authService = {
 
       return res
     } catch {
-      const res = NextResponse.redirect(new URL('/auth/login', req.url))
-      res.cookies.delete(ACCESS_COOKIE)
-      res.cookies.delete(REFRESH_COOKIE)
-      res.cookies.delete(HASAUTH_COOKIE)
-      return res
+      return redirectToLogin(req)
     }
   },
   async checkCookies(req: NextRequest) {

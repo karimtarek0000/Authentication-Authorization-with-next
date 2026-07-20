@@ -6,7 +6,7 @@ import { useState } from 'react'
 
 export default function Login() {
   //   const searchParams = useSearchParams()
-  const { replace } = useRouter()
+  const { push } = useRouter()
   const { login } = useAuthActions()
 
   const [email, setEmail] = useState('karim@test.com')
@@ -23,7 +23,7 @@ export default function Login() {
       const data = await login({ email, password })
 
       console.log(data)
-      replace('/dashboard')
+      push('/dashboard')
       //   const from = searchParams.get('from') || '/'
     } catch (err) {
       const message = err instanceof Error ? err.message : 'حصل خطأ'

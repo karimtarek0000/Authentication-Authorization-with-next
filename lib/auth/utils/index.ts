@@ -1,4 +1,5 @@
-import { REFRESH_BUFFER } from '@/lib/auth'
+import { ACCESS_COOKIE, HASAUTH_COOKIE, REFRESH_BUFFER, REFRESH_COOKIE } from '@/lib/auth'
+import { NextRequest, NextResponse } from 'next/server'
 
 function decodePayload(token: string) {
   const base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')
@@ -24,4 +25,17 @@ export function replaceCookie(header: string | null, name: string, value: string
     .filter(c => c && !c.startsWith(`${name}=`))
     .concat(`${name}=${value}`)
     .join('; ')
+}
+
+export function redirectToLogin(req: NextRequest) {
+  const url = new URL('/auth', req.url)
+  url.searchParams.set('backTo', req.nextUrl.pathname)
+
+  const res = NextResponse.redirect(url)
+
+  res.cookies.delete(ACCESS_COOKIE)
+  res.cookies.delete(REFRESH_COOKIE)
+  res.cookies.delete(HASAUTH_COOKIE)
+
+  return res
 }
