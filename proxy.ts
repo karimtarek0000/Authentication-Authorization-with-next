@@ -1,4 +1,4 @@
-import { authService, isExpired, redirectToLogin } from '@/lib/auth'
+import { ACCESS_COOKIE, authService, isExpired, redirectToLogin } from '@/lib/auth'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function proxy(req: NextRequest) {
@@ -18,7 +18,14 @@ export async function proxy(req: NextRequest) {
     return NextResponse.redirect(new URL(searchParams.get('backTo') ?? '/dashboard', req.url))
   }
 
-  if (!isExpired(accessToken)) return NextResponse.next()
+  if (!isExpired(accessToken)) {
+    // If case `Authorization` on header
+    const headers = new Headers(req.headers)
+    const accessToken = req.cookies.get(ACCESS_COOKIE)?.value
+    headers.set('x-access-token', accessToken ?? '')
+
+    return NextResponse.next({ request: { headers } })
+  }
 
   return await authService.restoreSessionToken(req, refreshToken!)
 }

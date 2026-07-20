@@ -38,10 +38,8 @@ export const authService = {
       const headers = new Headers(req.headers)
       headers.set('cookie', replaceCookie(req.headers.get('cookie'), ACCESS_COOKIE, newAccessToken))
 
-      // Send to layout
-      // headers.set('x-access-token', newAccessToken)
-
-      console.log(newAccessToken)
+      // If case `Authorization` on header
+      headers.set('x-access-token', newAccessToken)
 
       const res = NextResponse.next({ request: { headers } })
 

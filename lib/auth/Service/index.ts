@@ -11,13 +11,10 @@ const initialAuthState: AuthState = {
   isAuth: false,
 }
 
-export const useAuthService = (initialToken: string | null) => {
+export const useAuthService = () => {
   //   const [isLoading, setLoading] = useState()
   //   const [accessToken, setAccessToken] = useState()
-  const [userAuth, setUserAuth] = useState<AuthState>({
-    ...initialAuthState,
-    accessToken: initialToken,
-  })
+  const [userAuth, setUserAuth] = useState<AuthState>(initialAuthState)
 
   const setAuthData = (data: any) => {
     const { id, name, permissions, role, accessToken } = data
