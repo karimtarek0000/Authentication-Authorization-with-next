@@ -16,21 +16,23 @@ import { cache } from 'react'
 import { apiServer } from '../Call'
 import { getCookie } from './cookies'
 
-export const userProfile = cache(async () => {
-  const hasAuth = await getCookie(HASAUTH_COOKIE)
+// export const userProfile = async (): any => {
+//   const cookie = await cookies()
+//   const hasAuth = await getCookie(HASAUTH_COOKIE)
 
-  if (!hasAuth) return initialAuthState
+//   if (!hasAuth) return initialAuthState
 
-  try {
-    const { id, name, permissions, role } = await apiServer.get<ILoginResponse>(PROFILE)
+//   try {
+//     const { id, name, permissions, role } = await apiServer.get<ILoginResponse>(PROFILE)
+//     cookie.set('permissions', 'edit_profile')
 
-    console.log('Working 🚀')
+//     console.log('Working 🚀')
 
-    return { user: { id, name }, permissions, role } as AuthState
-  } catch {
-    return userLogout()
-  }
-})
+//     return { user: { id, name }, permissions, role } as AuthState
+//   } catch {
+//     // return userLogout()
+//   }
+// }
 
 export const userLogout = async () => {
   const cookie = await cookies()
@@ -38,6 +40,7 @@ export const userLogout = async () => {
   cookie.delete(ACCESS_COOKIE)
   cookie.delete(REFRESH_COOKIE)
   cookie.delete(HASAUTH_COOKIE)
+  cookie.delete('permissions')
 
   redirect(PAGES['auth'])
 }

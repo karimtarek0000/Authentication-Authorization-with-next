@@ -23,7 +23,6 @@ export interface ILoginResponse {
 // ================= CONTEXT_API =================
 export type AuthProviderProps = {
   children: ReactNode
-  userProfile: AuthState
 }
 
 export type AuthState = {

@@ -1,5 +1,6 @@
 import {
   ACCESS_COOKIE,
+  getCookie,
   HASAUTH_COOKIE,
   redirectToLogin,
   REFRESH_COOKIE,
@@ -62,5 +63,9 @@ export const authService = {
       refreshToken,
       hasAuth,
     }
+  },
+  async permissions() {
+    const permissions = await getCookie('permissions')
+    return JSON.parse(permissions as string) as []
   },
 }

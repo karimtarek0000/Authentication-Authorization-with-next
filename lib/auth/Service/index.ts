@@ -10,9 +10,9 @@ export const initialAuthState: AuthState = {
   isAuth: false,
 }
 
-export const useAuthService = (userProfile: AuthState) => {
+export const useAuthService = () => {
   const [userAuth, setUserAuth] = useState<AuthState>({
-    ...userProfile,
+    ...initialAuthState,
     isAuth: true,
   })
 
@@ -30,7 +30,10 @@ export const useAuthService = (userProfile: AuthState) => {
   const login = async ({ email, password }: ILogin) => {
     try {
       const data = await api.post<ILoginResponse>('/auth-test', { email, password })
-      await setCookie('hasAuth', 'true')
+      await Promise.all([
+        setCookie('hasAuth', 'true'),
+        setCookie('permissions', JSON.stringify(data.permissions)),
+      ])
 
       setAuthData(data)
       return data

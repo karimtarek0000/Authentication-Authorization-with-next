@@ -8,7 +8,7 @@ export const setCookie = async (name: string, value: string, opt?: Partial<Respo
   cookie.set(name, value, opt)
 }
 
-export const getCookie = async (name: string) => {
+export const getCookie = async <T>(name: string): Promise<T> => {
   const cookie = await cookies()
-  return cookie.get(name)?.value
+  return cookie.get(name)?.value as T
 }

@@ -10,7 +10,7 @@ const Profile = () => {
     <>
       <h2>Id: {user?.id}</h2>
       <h2>name: {user?.name}</h2>
-      <h2>{permissions.join(' | ')}</h2>
+      {/* <h2>{permissions.join(' | ')}</h2> */}
       <button onClick={logout}>Logout</button>
     </>
   )
