@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers'
 
-async function serverFetch<T>(path: string, opts: RequestInit = {}) {
+export async function fetchServer<T>(path: string, opts: RequestInit = { method: 'GET' }) {
   const c = await cookies()
   const accessToken = c.get('accessToken')?.value
 
@@ -15,11 +15,4 @@ async function serverFetch<T>(path: string, opts: RequestInit = {}) {
   })
   if (!res.ok) throw Object.assign(new Error(res.statusText), { status: res.status })
   return res.json() as Promise<T>
-}
-
-export const apiServer = {
-  get: <T>(path: string, options?: RequestInit) =>
-    serverFetch<T>(path, { ...options, method: 'GET' }),
-  post: <T>(path: string, body?: unknown, options?: RequestInit) =>
-    serverFetch<T>(path, { ...options, method: 'POST', body: JSON.stringify(body) }),
 }

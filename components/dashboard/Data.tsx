@@ -1,6 +1,6 @@
 'use client'
 
-import { api } from '@/lib/auth'
+import { fetchClient } from '@/lib/auth'
 import { useState } from 'react'
 
 const Data = () => {
@@ -8,7 +8,7 @@ const Data = () => {
 
   async function getData() {
     try {
-      const data = await api.get('/data')
+      const data = await fetchClient.get('/data')
       setData(data)
     } catch (error) {
       console.log(error)

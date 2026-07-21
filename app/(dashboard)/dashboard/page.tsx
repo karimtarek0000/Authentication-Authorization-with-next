@@ -1,7 +1,7 @@
 import Profile from '@/components/auth/Profile'
 import Data from '@/components/dashboard/Data'
 import { permissions } from '@/lib/auth'
-import { apiServer } from '@/lib/auth/Call'
+import { fetchServer } from '@/lib/auth/Call'
 import Link from 'next/link'
 
 interface Data {
@@ -14,7 +14,7 @@ interface Data {
 
 export default async function Page() {
   const permis = await permissions()
-  const data = await apiServer.get<Data>('/data')
+  const data = await fetchServer<Data>('/data')
 
   return (
     <>

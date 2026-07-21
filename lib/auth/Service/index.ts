@@ -1,8 +1,8 @@
 'use client'
 
 import {
-  api,
   AuthState,
+  fetchClient,
   getCookie,
   HASAUTH_COOKIE,
   ILogin,
@@ -36,7 +36,7 @@ export const useAuthService = () => {
 
   const login = async ({ email, password }: ILogin) => {
     try {
-      const data = await api.post<ILoginResponse>('/auth-test', { email, password })
+      const data = await fetchClient.post<ILoginResponse>('/auth-test', { email, password })
       await whenUserLogin(data.permissions)
 
       setAuthData(data)
@@ -46,9 +46,7 @@ export const useAuthService = () => {
     }
   }
 
-  const logout = async () => {
-    await userLogout()
-  }
+  const logout = async () => await userLogout()
 
   const userProfile = useCallback(async () => {
     const hasAuth = await getCookie(HASAUTH_COOKIE)
@@ -56,7 +54,7 @@ export const useAuthService = () => {
     if (!hasAuth) return
 
     try {
-      const data = await api.get<ILoginResponse>(PROFILE)
+      const data = await fetchClient.get<ILoginResponse>(PROFILE)
       setAuthData(data)
       console.log('Working 🚀')
     } catch {

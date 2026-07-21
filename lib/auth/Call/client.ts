@@ -66,7 +66,7 @@ async function apiFetch<T>(
 }
 
 // ================ METHODS ================
-export const api = {
+export const fetchClient = {
   get: <T>(path: string, options?: RequestInit) => apiFetch<T>(path, { ...options, method: 'GET' }),
 
   post: <T>(path: string, body?: unknown, options?: RequestInit) =>
