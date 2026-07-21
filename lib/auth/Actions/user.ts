@@ -3,14 +3,15 @@
 import {
   ACCESS_COOKIE,
   COOKIE_OPTIONS,
+  deleteCookie,
   HASAUTH_COOKIE,
   PAGES,
   Permission,
   PERMISSIONS_COOKIE,
   REFRESH_COOKIE,
+  setCookie,
 } from '@/lib/auth'
 import { redirect } from 'next/navigation'
-import { deleteCookie, setCookie } from './cookies'
 
 export const whenUserLogin = async (permission: Permission[]) => {
   await Promise.all([

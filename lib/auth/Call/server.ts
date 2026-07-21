@@ -1,10 +1,9 @@
 'server-only'
 
-import { cookies } from 'next/headers'
+import { ACCESS_COOKIE, getCookie } from '@/lib/auth'
 
 export async function fetchServer<T>(path: string, opts: RequestInit = { method: 'GET' }) {
-  const c = await cookies()
-  const accessToken = c.get('accessToken')?.value
+  const accessToken = await getCookie(ACCESS_COOKIE)
 
   const res = await fetch(process.env.NEXT_PUBLIC_API_URL + path, {
     ...opts,
