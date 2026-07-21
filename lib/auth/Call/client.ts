@@ -34,7 +34,7 @@ async function apiFetch<T>(
   retries = 2,
   failRetries = 2,
 ): Promise<T> {
-  const token = authService.accessToken
+  // const token = await getCookie(ACCESS_COOKIE)
 
   const res = await fetch(BASE_URL + path, {
     ...opts,
@@ -42,7 +42,7 @@ async function apiFetch<T>(
     signal: controller.signal,
     headers: {
       'Content-Type': 'application/json',
-      ...(token && { Authorization: `Bearer ${token}` }),
+      // ...(token && { Authorization: `Bearer ${token}` }),
       ...opts.headers,
     },
   })

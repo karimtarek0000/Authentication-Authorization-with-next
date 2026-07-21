@@ -9,10 +9,6 @@ import {
 import { NextRequest, NextResponse } from 'next/server'
 
 export const authService = {
-  accessToken() {
-    if (typeof document === 'undefined') return null
-    return document.cookie.match(/(?:^|;\s*)accessToken=([^;]*)/)?.[1] ?? null
-  },
   async refreshToken(refreshToken?: string) {
     try {
       const headers = refreshToken ? { Cookie: `refreshToken=${refreshToken}` } : undefined
@@ -27,10 +23,9 @@ export const authService = {
       if (!response.ok) throw new Error('Refresh token failed')
       const data = await response.json()
 
-      this.accessToken = data.accessToken
       return data.accessToken
     } catch (error) {
-      console.log(error)
+      throw error
     }
   },
   async restoreSessionToken(req: NextRequest, refreshToken: string) {
@@ -39,9 +34,6 @@ export const authService = {
 
       const headers = new Headers(req.headers)
       headers.set('cookie', replaceCookie(req.headers.get('cookie'), ACCESS_COOKIE, newAccessToken))
-
-      // If case `Authorization` on header
-      headers.set('x-access-token', newAccessToken)
 
       const res = NextResponse.next({ request: { headers } })
 
@@ -57,7 +49,7 @@ export const authService = {
       return redirectToLogin(req)
     }
   },
-  async checkCookies(req: NextRequest) {
+  async checkCookiesBeforeRoute(req: NextRequest) {
     const accessToken = req.cookies.get(ACCESS_COOKIE)?.value
     const refreshToken = req.cookies.get(REFRESH_COOKIE)?.value
     const hasAuth = req.cookies.get(HASAUTH_COOKIE)?.value
