@@ -1,3 +1,5 @@
+'server-only'
+
 import { cookies } from 'next/headers'
 
 export async function fetchServer<T>(path: string, opts: RequestInit = { method: 'GET' }) {
