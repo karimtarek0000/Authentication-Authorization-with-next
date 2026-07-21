@@ -1,7 +1,6 @@
 'use client'
 
 import { api, AuthState, ILogin, ILoginResponse, setCookie, userLogout } from '@/lib/auth'
-import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 export const initialAuthState: AuthState = {
@@ -16,7 +15,6 @@ export const useAuthService = (userProfile: AuthState) => {
     ...userProfile,
     isAuth: true,
   })
-  const { replace } = useRouter()
 
   const setAuthData = (data: any) => {
     const { id, name, permissions, role } = data

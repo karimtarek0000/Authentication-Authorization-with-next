@@ -8,7 +8,7 @@ async function serverFetch<T>(path: string, opts: RequestInit = {}) {
     ...opts,
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${accessToken}`,
+      // Authorization: `Bearer ${accessToken}`,
       Cookie: `accessToken=${accessToken}`,
       ...opts.headers,
     },
