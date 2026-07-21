@@ -18,10 +18,11 @@ export default async function Page() {
 
   return (
     <>
-      <h1>{data.data.userId}</h1>
-      <h1>{data.data.name}</h1>
-      <h1>{data.data.course}</h1>
-      <h1>{permissions.join(' | ')}</h1>
+      <h1>Server</h1>
+      <h2>{data.data.userId}</h2>
+      <h2>{data.data.name}</h2>
+      <h2>{data.data.course}</h2>
+      <h2>{permissions.join(' | ')}</h2>
       <br />
       <Profile />
       <Data />

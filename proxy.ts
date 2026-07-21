@@ -4,11 +4,11 @@ import { NextResponse, type NextRequest } from 'next/server'
 export async function proxy(req: NextRequest) {
   if (req.headers.has('next-router-prefetch')) return NextResponse.next()
 
-  const { accessToken, hasAuth, refreshToken } = await authService.checkCookiesBeforeRoute(req)
+  const { accessToken, refreshToken } = await authService.checkCookiesBeforeRoute(req)
 
   const { pathname, searchParams } = req.nextUrl
   const isAuthPage = pathname.startsWith(PAGES['auth'])
-  const isAuth = Boolean(hasAuth && refreshToken)
+  const isAuth = Boolean(accessToken && refreshToken)
 
   if (!isAuth) {
     return isAuthPage ? NextResponse.next() : redirectToLogin(req)

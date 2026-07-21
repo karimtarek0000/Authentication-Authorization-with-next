@@ -8,9 +8,10 @@ const Profile = () => {
 
   return (
     <>
-      <h2>Id: {user?.id}</h2>
-      <h2>name: {user?.name}</h2>
-      {/* <h2>{permissions.join(' | ')}</h2> */}
+      <h1>Client</h1>
+      <h2>Id from client: {user?.id}</h2>
+      <h2>Name from client: {user?.name}</h2>
+      <h2>Permissions from client: {permissions.join(' | ')}</h2>
       <button onClick={logout}>Logout</button>
     </>
   )

@@ -1,4 +1,10 @@
-import { ACCESS_COOKIE, HASAUTH_COOKIE, PAGES, REFRESH_BUFFER, REFRESH_COOKIE } from '@/lib/auth'
+import {
+  ACCESS_COOKIE,
+  PAGES,
+  PERMISSIONS_COOKIE,
+  REFRESH_BUFFER,
+  REFRESH_COOKIE,
+} from '@/lib/auth'
 import { NextRequest, NextResponse } from 'next/server'
 
 function decodePayload(token: string) {
@@ -35,7 +41,7 @@ export function redirectToLogin(req: NextRequest) {
 
   res.cookies.delete(ACCESS_COOKIE)
   res.cookies.delete(REFRESH_COOKIE)
-  res.cookies.delete(HASAUTH_COOKIE)
+  res.cookies.delete(PERMISSIONS_COOKIE)
 
   return res
 }
