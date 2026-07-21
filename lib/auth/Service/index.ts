@@ -56,7 +56,6 @@ export const useAuthService = () => {
     try {
       const data = await fetchClient.get<ILoginResponse>(PROFILE)
       setAuthData(data)
-      console.log('Working 🚀')
     } catch {
       logout()
     }
