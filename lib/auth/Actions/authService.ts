@@ -1,20 +1,15 @@
+'use server'
+
 import {
   ACCESS_COOKIE,
+  COOKIE_OPTIONS,
   getCookie,
   redirectToLogin,
   REFRESH_COOKIE,
   REFRESH_TOKEN,
   replaceCookie,
 } from '@/lib/auth'
-import { ResponseCookie } from 'next/dist/compiled/@edge-runtime/cookies'
 import { NextRequest, NextResponse } from 'next/server'
-
-export const COOKIE_OPTIONS: Partial<ResponseCookie> = {
-  httpOnly: true,
-  secure: process.env.NODE_ENV === 'production',
-  sameSite: 'lax',
-  path: '/',
-}
 
 export const refreshToken = async (refreshToken?: string) => {
   try {
