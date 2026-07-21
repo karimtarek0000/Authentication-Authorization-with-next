@@ -12,3 +12,10 @@ export const getCookie = async <T>(name: string): Promise<T> => {
   const cookie = await cookies()
   return cookie.get(name)?.value as T
 }
+
+export const deleteCookie = async (names: string[]) => {
+  const cookie = await cookies()
+  for (const name of names) {
+    cookie.delete(name)
+  }
+}

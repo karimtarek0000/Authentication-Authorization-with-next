@@ -1,4 +1,4 @@
-import { authService } from '@/lib/auth'
+import { refreshToken } from '@/lib/auth'
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL!
 
@@ -14,8 +14,7 @@ export const abortPending = () => {
 let refreshing: Promise<string | null> | null = null
 
 const refreshOnce = (): Promise<string | null> => {
-  refreshing ??= authService
-    .refreshToken()
+  refreshing ??= refreshToken()
     .then(token => token ?? null)
     .catch(() => null)
     .finally(() => {

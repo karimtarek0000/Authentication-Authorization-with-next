@@ -18,7 +18,7 @@ export const REFRESH_BUFFER = 30
 export const ACCESS_COOKIE = 'accessToken'
 export const REFRESH_COOKIE = 'refreshToken'
 export const PERMISSIONS_COOKIE = 'permissions'
-export const HASAUTH_STORAGE = 'hasAuth'
+export const HASAUTH_COOKIE = 'hasAuth'
 
 export const PAGES = {
   auth: '/auth',

@@ -1,7 +1,6 @@
 import {
   ACCESS_COOKIE,
   getCookie,
-  HASAUTH_COOKIE,
   redirectToLogin,
   REFRESH_COOKIE,
   REFRESH_TOKEN,
@@ -17,53 +16,54 @@ export const COOKIE_OPTIONS: Partial<ResponseCookie> = {
   path: '/',
 }
 
-export const authService = {
-  async refreshToken(refreshToken?: string) {
-    try {
-      const headers = refreshToken ? { Cookie: `refreshToken=${refreshToken}` } : undefined
+export const refreshToken = async (refreshToken?: string) => {
+  try {
+    const headers = refreshToken ? { Cookie: `refreshToken=${refreshToken}` } : undefined
 
-      const response = await fetch(REFRESH_TOKEN, {
-        method: 'POST',
-        credentials: 'include',
-        cache: 'no-store',
-        headers,
-      })
+    const response = await fetch(REFRESH_TOKEN, {
+      method: 'POST',
+      credentials: 'include',
+      cache: 'no-store',
+      headers,
+    })
 
-      if (!response.ok) throw new Error('Refresh token failed')
-      const data = await response.json()
+    if (!response.ok) throw new Error('Refresh token failed')
+    const data = await response.json()
 
-      return data.accessToken
-    } catch (error) {
-      throw error
-    }
-  },
-  async restoreSessionToken(req: NextRequest, refreshToken: string) {
-    try {
-      const newAccessToken = await authService.refreshToken(refreshToken)
+    return data.accessToken
+  } catch (error) {
+    throw error
+  }
+}
 
-      const headers = new Headers(req.headers)
-      headers.set('cookie', replaceCookie(req.headers.get('cookie'), ACCESS_COOKIE, newAccessToken))
+export const restoreSessionToken = async (req: NextRequest, _refreshToken: string) => {
+  try {
+    const newAccessToken = await refreshToken(_refreshToken)
 
-      const res = NextResponse.next({ request: { headers } })
+    const headers = new Headers(req.headers)
+    headers.set('cookie', replaceCookie(req.headers.get('cookie'), ACCESS_COOKIE, newAccessToken))
 
-      res.cookies.set(ACCESS_COOKIE, newAccessToken, COOKIE_OPTIONS)
+    const res = NextResponse.next({ request: { headers } })
 
-      return res
-    } catch {
-      return redirectToLogin(req)
-    }
-  },
-  async checkCookiesBeforeRoute(req: NextRequest) {
-    const accessToken = req.cookies.get(ACCESS_COOKIE)?.value
-    const refreshToken = req.cookies.get(REFRESH_COOKIE)?.value
+    res.cookies.set(ACCESS_COOKIE, newAccessToken, COOKIE_OPTIONS)
 
-    return {
-      accessToken,
-      refreshToken,
-    }
-  },
-  async permissions() {
-    const permissions = await getCookie('permissions')
-    return JSON.parse(permissions as string) as []
-  },
+    return res
+  } catch {
+    return redirectToLogin(req)
+  }
+}
+
+export const checkCookiesBeforeRoute = async (req: NextRequest) => {
+  const accessToken = req.cookies.get(ACCESS_COOKIE)?.value
+  const refreshToken = req.cookies.get(REFRESH_COOKIE)?.value
+
+  return {
+    accessToken,
+    refreshToken,
+  }
+}
+
+export const permissions = async () => {
+  const permissions = await getCookie('permissions')
+  return JSON.parse(permissions as string) as []
 }

@@ -1,10 +1,16 @@
-import { authService, isExpired, PAGES, redirectToLogin } from '@/lib/auth'
+import {
+  checkCookiesBeforeRoute,
+  isExpired,
+  PAGES,
+  redirectToLogin,
+  restoreSessionToken,
+} from '@/lib/auth'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function proxy(req: NextRequest) {
   if (req.headers.has('next-router-prefetch')) return NextResponse.next()
 
-  const { accessToken, refreshToken } = await authService.checkCookiesBeforeRoute(req)
+  const { accessToken, refreshToken } = await checkCookiesBeforeRoute(req)
 
   const { pathname, searchParams } = req.nextUrl
   const isAuthPage = pathname.startsWith(PAGES['auth'])
@@ -22,7 +28,7 @@ export async function proxy(req: NextRequest) {
     return NextResponse.next()
   }
 
-  return await authService.restoreSessionToken(req, refreshToken!)
+  return await restoreSessionToken(req, refreshToken!)
 }
 
 export const config = {

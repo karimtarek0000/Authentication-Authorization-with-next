@@ -3,25 +3,24 @@
 import {
   ACCESS_COOKIE,
   COOKIE_OPTIONS,
+  HASAUTH_COOKIE,
   PAGES,
   Permission,
   PERMISSIONS_COOKIE,
   REFRESH_COOKIE,
 } from '@/lib/auth'
-import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { setCookie } from './cookies'
+import { deleteCookie, setCookie } from './cookies'
 
 export const whenUserLogin = async (permission: Permission[]) => {
-  await setCookie(PERMISSIONS_COOKIE, JSON.stringify(permission), COOKIE_OPTIONS)
+  await Promise.all([
+    setCookie(PERMISSIONS_COOKIE, JSON.stringify(permission), COOKIE_OPTIONS),
+    setCookie(HASAUTH_COOKIE, 'true'),
+  ])
 }
 
 export const userLogout = async () => {
-  const cookie = await cookies()
-
-  cookie.delete(ACCESS_COOKIE)
-  cookie.delete(REFRESH_COOKIE)
-  cookie.delete(PERMISSIONS_COOKIE)
+  await deleteCookie([ACCESS_COOKIE, REFRESH_COOKIE, PERMISSIONS_COOKIE, HASAUTH_COOKIE])
 
   redirect(PAGES['auth'])
 }

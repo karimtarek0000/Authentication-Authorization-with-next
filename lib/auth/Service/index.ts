@@ -4,14 +4,14 @@ import {
   api,
   AuthState,
   getCookie,
-  HASAUTH_STORAGE,
+  HASAUTH_COOKIE,
   ILogin,
   ILoginResponse,
   PROFILE,
   userLogout,
   whenUserLogin,
 } from '@/lib/auth'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 export const initialAuthState: AuthState = {
   user: null,
@@ -22,7 +22,6 @@ export const initialAuthState: AuthState = {
 
 export const useAuthService = () => {
   const [userAuth, setUserAuth] = useState<AuthState>(initialAuthState)
-  const hasAuth = useRef<string | null>(null)
 
   const setAuthData = (data: any) => {
     const { id, name, permissions, role } = data
@@ -33,8 +32,6 @@ export const useAuthService = () => {
       role,
       isAuth: true,
     })
-
-    localStorage.setItem('hasAuth', 'true')
   }
 
   const login = async ({ email, password }: ILogin) => {
@@ -50,25 +47,26 @@ export const useAuthService = () => {
   }
 
   const logout = async () => {
-    localStorage.removeItem(HASAUTH_STORAGE)
     await userLogout()
   }
 
   const userProfile = useCallback(async () => {
+    const hasAuth = await getCookie(HASAUTH_COOKIE)
+
+    if (!hasAuth) return
+
     try {
       const data = await api.get<ILoginResponse>(PROFILE)
       setAuthData(data)
+      console.log('Working 🚀')
     } catch {
       logout()
     }
   }, [])
 
   useEffect(() => {
-    hasAuth.current = localStorage.getItem(HASAUTH_STORAGE)
-
-    if (hasAuth.current) {
-      userProfile()
-    }
+    const profile = async () => await userProfile()
+    profile()
   }, [userProfile])
 
   return { login, logout, userAuth }

@@ -1,5 +1,8 @@
+'server-only'
+
 import {
   ACCESS_COOKIE,
+  HASAUTH_COOKIE,
   PAGES,
   PERMISSIONS_COOKIE,
   REFRESH_BUFFER,
@@ -42,6 +45,7 @@ export function redirectToLogin(req: NextRequest) {
   res.cookies.delete(ACCESS_COOKIE)
   res.cookies.delete(REFRESH_COOKIE)
   res.cookies.delete(PERMISSIONS_COOKIE)
+  res.cookies.delete(HASAUTH_COOKIE)
 
   return res
 }
