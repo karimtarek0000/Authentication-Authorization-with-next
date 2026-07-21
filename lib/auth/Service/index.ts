@@ -1,6 +1,7 @@
 'use client'
 
-import { api, AuthState, ILogin, ILoginResponse, setCookie, userLogout } from '@/lib/auth'
+import { api, AuthState, ILogin, ILoginResponse, PAGES, setCookie, userLogout } from '@/lib/auth'
+import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 export const initialAuthState: AuthState = {
@@ -11,6 +12,7 @@ export const initialAuthState: AuthState = {
 }
 
 export const useAuthService = (userProfile: AuthState) => {
+  const { replace } = useRouter()
   const [userAuth, setUserAuth] = useState<AuthState>({
     ...userProfile,
     isAuth: true,
@@ -41,7 +43,7 @@ export const useAuthService = (userProfile: AuthState) => {
 
   const logout = async () => {
     await userLogout()
-    location.reload()
+    replace(PAGES['auth'])
   }
 
   return { login, logout, userAuth }

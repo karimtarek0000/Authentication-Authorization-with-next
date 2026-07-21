@@ -10,10 +10,11 @@ import {
   REFRESH_COOKIE,
 } from '@/lib/auth'
 import { cookies } from 'next/headers'
+import { cache } from 'react'
 import { apiServer } from '../Call'
 import { getCookie } from './cookies'
 
-export const userProfile = async () => {
+export const userProfile = cache(async () => {
   const hasAuth = await getCookie(HASAUTH_COOKIE)
 
   if (!hasAuth) return initialAuthState
@@ -25,7 +26,7 @@ export const userProfile = async () => {
   } catch {
     return initialAuthState
   }
-}
+})
 
 export const userLogout = async () => {
   const cookie = await cookies()
