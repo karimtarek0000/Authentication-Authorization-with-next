@@ -1,10 +1,11 @@
 'use server'
 
+import { ResponseCookie } from 'next/dist/compiled/@edge-runtime/cookies'
 import { cookies } from 'next/headers'
 
-export const setCookie = async (name: string, value: string) => {
+export const setCookie = async (name: string, value: string, opt?: Partial<ResponseCookie>) => {
   const cookie = await cookies()
-  cookie.set(name, value)
+  cookie.set(name, value, opt)
 }
 
 export const getCookie = async (name: string) => {
