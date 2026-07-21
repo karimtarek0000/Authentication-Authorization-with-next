@@ -6,7 +6,15 @@ import {
   REFRESH_TOKEN,
   replaceCookie,
 } from '@/lib/auth'
+import { ResponseCookie } from 'next/dist/compiled/@edge-runtime/cookies'
 import { NextRequest, NextResponse } from 'next/server'
+
+const COOKIE_OPTIONS: Partial<ResponseCookie> = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: 'lax',
+  path: '/',
+}
 
 export const authService = {
   async refreshToken(refreshToken?: string) {
@@ -37,12 +45,7 @@ export const authService = {
 
       const res = NextResponse.next({ request: { headers } })
 
-      res.cookies.set(ACCESS_COOKIE, newAccessToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        path: '/',
-      })
+      res.cookies.set(ACCESS_COOKIE, newAccessToken, COOKIE_OPTIONS)
 
       return res
     } catch {

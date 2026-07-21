@@ -40,7 +40,7 @@ export const useAuthService = () => {
     try {
       const data = await api.post<ILoginResponse>('/auth-test', { email, password })
       await setCookie('hasAuth', 'true')
-      authService.accessToken = data.accessToken
+
       setAuthData(data)
       return data
     } catch (error) {
