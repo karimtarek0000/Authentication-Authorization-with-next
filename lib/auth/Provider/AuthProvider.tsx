@@ -5,6 +5,8 @@ import {
   AuthActionsContext,
   AuthProviderProps,
   AuthStateContext,
+  Idle,
+  SyncTabs,
   useAuthService,
 } from '@/lib/auth'
 import { useMemo } from 'react'
@@ -16,7 +18,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   return (
     <AuthStateContext.Provider value={userAuth}>
-      <AuthActionsContext.Provider value={actions}>{children}</AuthActionsContext.Provider>
+      <AuthActionsContext.Provider value={actions}>
+        <SyncTabs>
+          <Idle>{children}</Idle>
+        </SyncTabs>
+      </AuthActionsContext.Provider>
     </AuthStateContext.Provider>
   )
 }
