@@ -1,9 +1,8 @@
-import { cookies, headers } from 'next/headers'
+import { cookies } from 'next/headers'
 
 async function serverFetch<T>(path: string, opts: RequestInit = {}) {
-  const h = await headers()
   const c = await cookies()
-  const accessToken = h.get('x-access-token') ?? c.get('accessToken')?.value
+  const accessToken = c.get('accessToken')?.value
 
   const res = await fetch(process.env.NEXT_PUBLIC_API_URL + path, {
     ...opts,

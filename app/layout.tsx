@@ -1,7 +1,6 @@
-import { AuthProvider } from '@/lib/auth'
+import { AuthProvider, userProfile } from '@/lib/auth'
 import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
-import { headers } from 'next/headers'
 import './globals.css'
 
 const geistSans = Geist({
@@ -24,10 +23,12 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const profile = await userProfile()
+
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider userProfile={profile}>{children}</AuthProvider>
       </body>
     </html>
   )

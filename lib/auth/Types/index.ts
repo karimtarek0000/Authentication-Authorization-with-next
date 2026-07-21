@@ -16,16 +16,17 @@ export interface ILoginResponse {
   id: string
   name: string
   email: string
-  permissions: []
+  permissions: Permission[]
+  role: string
 }
 
 // ================= CONTEXT_API =================
 export type AuthProviderProps = {
   children: ReactNode
+  userProfile: AuthState
 }
 
 export type AuthState = {
-  accessToken: string | null
   user: AuthUser | null
   permissions: Permission[]
   role: string

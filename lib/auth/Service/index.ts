@@ -1,35 +1,28 @@
 'use client'
 
-import {
-  api,
-  authService,
-  AuthState,
-  ILogin,
-  ILoginResponse,
-  setCookie,
-  userLogout,
-} from '@/lib/auth'
+import { api, AuthState, ILogin, ILoginResponse, setCookie, userLogout } from '@/lib/auth'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
-const initialAuthState: AuthState = {
-  accessToken: '',
+export const initialAuthState: AuthState = {
   user: null,
   permissions: [],
   role: '',
   isAuth: false,
 }
 
-export const useAuthService = () => {
-  const [userAuth, setUserAuth] = useState<AuthState>(initialAuthState)
+export const useAuthService = (userProfile: AuthState) => {
+  const [userAuth, setUserAuth] = useState<AuthState>({
+    ...userProfile,
+    isAuth: true,
+  })
   const { replace } = useRouter()
 
   const setAuthData = (data: any) => {
-    const { id, name, permissions, role, accessToken } = data
+    const { id, name, permissions, role } = data
 
     setUserAuth({
       user: { id, name },
-      accessToken,
       permissions,
       role,
       isAuth: true,
@@ -50,7 +43,7 @@ export const useAuthService = () => {
 
   const logout = async () => {
     await userLogout()
-    replace('/auth')
+    location.reload()
   }
 
   return { login, logout, userAuth }
