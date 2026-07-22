@@ -1,3 +1,4 @@
+import { PermissionRequirement } from '@/lib/auth'
 import { ResponseCookie } from 'next/dist/compiled/@edge-runtime/cookies'
 
 export const LOGIN = '/auth-test'
@@ -32,4 +33,5 @@ export const COOKIE_OPTIONS: Partial<ResponseCookie> = {
 export const PAGES = {
   auth: '/auth',
   dashboard: '/dashboard',
+  about: '/about',
 } as const

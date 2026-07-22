@@ -1,4 +1,4 @@
-import type { Permission, PermissionRequirement } from '@/lib/auth'
+import type { Permission, PermissionRequirement, TPages } from '@/lib/auth'
 
 // Check if user has a specific permission
 function $hasPermission(userPermissions: Permission[], required: Permission): boolean {
@@ -29,4 +29,10 @@ export const $checkPermissions = (
     return $hasAllPermissions(userPermissions, permissionRequirement.allOf)
   }
   return false
+}
+
+export const $permissionsOnServer: Partial<Record<TPages, PermissionRequirement>> = {
+  about: {
+    permission: 'edit_testing',
+  },
 }

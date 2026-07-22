@@ -1,3 +1,4 @@
+import { PAGES } from '@/lib/auth'
 import { ReactNode } from 'react'
 
 // ================= USER =================
@@ -43,6 +44,9 @@ export type AuthActions = {
 
 // ================= SYNC =================
 export type AuthEvent = 'logout'
+
+// ================= PAGES =================
+export type TPages = keyof typeof PAGES
 
 // ================= PERMISSIONS =================
 export const PERMISSIONS = {
