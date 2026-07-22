@@ -67,6 +67,7 @@ export const useAuthService = () => {
 
   const logout = async () => {
     authChannel.broadcast('logout')
+    setUserAuth(initialAuthState)
     await userLogout()
   }
 
@@ -87,6 +88,16 @@ export const useAuthService = () => {
     const profile = async () => await userProfile()
     profile()
   }, [userProfile])
+
+  useEffect(() => {
+    const unsubscribe = authChannel.subscribe(event => {
+      if (event === 'logout') {
+        setUserAuth(initialAuthState)
+      }
+    })
+
+    return unsubscribe
+  }, [])
 
   return { userAuth, login, logout, loginWithOAuth }
 }
