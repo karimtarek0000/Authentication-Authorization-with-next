@@ -22,11 +22,11 @@ export async function proxy(req: NextRequest) {
     return isAuthPage ? NextResponse.next() : redirectToLogin(req)
   }
 
-  if (isAuthPage) {
+  if (isAuth && isAuthPage) {
     return NextResponse.redirect(new URL(PAGES['dashboard'], req.url))
   }
 
-  if (isAuth && !isAuthPage) {
+  if (isAuth) {
     return checkPermissionsOnServer(req, pathname)
   }
 

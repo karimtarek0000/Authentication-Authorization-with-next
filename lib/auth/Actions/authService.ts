@@ -2,7 +2,7 @@
 
 import {
   $checkPermissions,
-  $permissionsOfPages,
+  $permissionsOnPages,
   ACCESS_COOKIE,
   COOKIE_OPTIONS,
   PAGES,
@@ -47,8 +47,8 @@ export const checkPermissionsOnServer = async (req: NextRequest, pathname: strin
   const permissions = userPermissions ? JSON.parse(userPermissions) : []
   const page = pathname.split('/').pop() as TPages
 
-  if ($permissionsOfPages[page]) {
-    const hasPermissions = $checkPermissions(permissions, $permissionsOfPages[page])
+  if ($permissionsOnPages[page]) {
+    const hasPermissions = $checkPermissions(permissions, $permissionsOnPages[page])
 
     if (!hasPermissions) {
       return NextResponse.redirect(new URL(PAGES['dashboard'], req.url))
