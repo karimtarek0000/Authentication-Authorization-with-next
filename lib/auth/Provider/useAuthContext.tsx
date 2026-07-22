@@ -1,4 +1,4 @@
-import { AuthActionsContext, AuthStateContext } from '@/lib/auth'
+import { AuthActionsContext, AuthStateContext } from '@/lib/auth/Provider'
 import { useContext } from 'react'
 
 export const useAuthActions = () => {

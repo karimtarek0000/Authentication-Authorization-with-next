@@ -1,6 +1,6 @@
 'use client'
 
-import { useAuthActions, useAuthState } from '@/lib/auth'
+import { useAuthActions, useAuthState } from '@/lib/auth/Provider'
 import { useEffect, useRef } from 'react'
 
 const IDLE_LIMIT = 15 * 60 * 1000 // 15 minutes

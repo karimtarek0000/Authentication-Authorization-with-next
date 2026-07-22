@@ -1,6 +1,7 @@
 'use client'
 
-import { startGithubLogin, startGoogleLogin, useAuthActions } from '@/lib/auth'
+import { startGoogleLogin, startGithubLogin } from '@/lib/auth'
+import { useAuthActions } from '@/lib/auth/Provider'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 

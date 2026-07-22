@@ -1,6 +1,6 @@
 'use client'
 
-import { authChannel } from '@/lib/auth'
+import { authChannel } from '@/lib/auth/Provider'
 import { useEffect, type ReactNode } from 'react'
 
 const SyncTabs = ({ children }: { children: ReactNode }) => {
