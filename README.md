@@ -2,44 +2,7 @@
 
 Authentication and Authorization system flow for applications with next.js 15+.
 
-## Project Structure
-
-```
-.
-├── app/
-│   ├── (auth)/
-│   │   └── auth/
-│   │       ├── page.tsx           # /auth — login page (renders Login)
-│   │       └── signup/
-│   │           └── page.tsx       # /auth/signup — placeholder
-│   ├── (dashboard)/
-│   │   └── dashboard/
-│   │       ├── page.tsx           # /dashboard — protected, server-fetches data + permissions
-│   │       └── about/
-│   │           └── page.tsx       # /dashboard/about — protected
-│   ├── components/                # (empty, reserved for shared UI)
-│   ├── layout.tsx                 # root layout, wraps the app in AuthProvider
-│   ├── page.tsx                   # / — default create-next-app page
-│   └── globals.css
-├── components/
-│   ├── auth/
-│   │   ├── Login.tsx               # client login form, calls useAuthActions().login
-│   │   └── Profile.tsx             # client component reading auth context + logout
-│   └── dashboard/
-│       └── Data.tsx                # client-side fetchClient example
-├── lib/
-│   └── auth/                       # all authentication logic (see below)
-├── proxy.ts                        # Next.js middleware (Next 16 renamed middleware.ts → proxy.ts)
-├── specs/
-│   └── 001-auth-flow/              # spec workspace (checklists/, contracts/)
-├── public/                         # static assets
-├── .env.local.example              # required env vars, copy to .env.local
-├── next.config.ts
-├── eslint.config.mjs
-└── tsconfig.json
-```
-
-### `lib/auth/` in detail
+### Auth Structure `lib/auth/` in detail
 
 ```
 lib/auth/
