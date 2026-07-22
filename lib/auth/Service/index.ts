@@ -26,6 +26,7 @@ export const initialAuthState: AuthState = {
 
 export const useAuthService = () => {
   const [userAuth, setUserAuth] = useState<AuthState>(initialAuthState)
+  const [isLoading, setIsLoading] = useState(true)
 
   const setAuthData = (data: ILoginResponse) => {
     const { id, name, permissions, role } = data
@@ -74,13 +75,18 @@ export const useAuthService = () => {
   const userProfile = useCallback(async () => {
     const hasAuth = await getCookie(HASAUTH_COOKIE)
 
-    if (!hasAuth) return
+    if (!hasAuth) {
+      setIsLoading(false)
+      return
+    }
 
     try {
       const data = await fetchClient.get<ILoginResponse>(PROFILE)
       setAuthData(data)
     } catch {
       logout()
+    } finally {
+      setIsLoading(false)
     }
   }, [])
 
@@ -99,5 +105,5 @@ export const useAuthService = () => {
     return unsubscribe
   }, [])
 
-  return { userAuth, login, logout, loginWithOAuth }
+  return { userAuth, login, logout, loginWithOAuth, isLoading }
 }
