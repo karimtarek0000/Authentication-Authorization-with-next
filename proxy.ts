@@ -26,12 +26,8 @@ export async function proxy(req: NextRequest) {
     return NextResponse.redirect(new URL(PAGES['dashboard'], req.url))
   }
 
-  if (isAuth) {
-    return checkPermissionsOnServer(req, pathname)
-  }
-
   if (!isExpired(accessToken)) {
-    return NextResponse.next()
+    return checkPermissionsOnServer(req, pathname)
   }
 
   return await restoreSessionToken(req, refreshToken!)
