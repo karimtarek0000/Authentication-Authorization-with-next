@@ -1,14 +1,15 @@
 'use client'
 
-import { startGoogleLogin, startGithubLogin } from '@/lib/auth'
+import { startGithubLogin, startGoogleLogin } from '@/lib/auth'
 import { useAuthActions } from '@/lib/auth/Provider'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useState } from 'react'
 
 export default function Login() {
   //   const searchParams = useSearchParams()
   const { replace } = useRouter()
   const { login } = useAuthActions()
+  const searchParams = useSearchParams()
 
   const [email, setEmail] = useState('karim@test.com')
   const [password, setPassword] = useState('4545454sdsd')
@@ -23,8 +24,8 @@ export default function Login() {
     try {
       await login({ email, password })
 
-      replace('/dashboard')
-      //   const from = searchParams.get('from') || '/'
+      const from = searchParams.get('backTo') || '/dashboard'
+      replace(from)
     } catch (err) {
       const message = err instanceof Error ? err.message : 'حصل خطأ'
       setError(message)

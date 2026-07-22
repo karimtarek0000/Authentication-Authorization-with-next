@@ -13,8 +13,9 @@ export async function proxy(req: NextRequest) {
 
   const { accessToken, refreshToken } = await checkCookiesBeforeRoute(req)
 
-  const { pathname, searchParams } = req.nextUrl
+  const { pathname } = req.nextUrl
   const isAuthPage = pathname.startsWith(PAGES['auth'])
+
   const isAuth = Boolean(accessToken && refreshToken)
 
   if (!isAuth) {
@@ -22,10 +23,10 @@ export async function proxy(req: NextRequest) {
   }
 
   if (isAuthPage) {
-    return NextResponse.redirect(new URL(searchParams.get('backTo') ?? PAGES['dashboard'], req.url))
+    return NextResponse.redirect(new URL(PAGES['dashboard'], req.url))
   }
 
-  if (isAuth) {
+  if (isAuth && !isAuthPage) {
     return checkPermissionsOnServer(req, pathname)
   }
 
