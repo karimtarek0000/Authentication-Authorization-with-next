@@ -1,13 +1,10 @@
 import {
-  $checkPermissions,
-  $permissionsOnServer,
   checkCookiesBeforeRoute,
+  checkPermissionsOnServer,
   isExpired,
   PAGES,
-  PERMISSIONS_COOKIE,
   redirectToLogin,
   restoreSessionToken,
-  TPages,
 } from '@/lib/auth'
 import { NextResponse, type NextRequest } from 'next/server'
 
@@ -28,21 +25,8 @@ export async function proxy(req: NextRequest) {
     return NextResponse.redirect(new URL(searchParams.get('backTo') ?? PAGES['dashboard'], req.url))
   }
 
-  // FOR PERMISSIONS
   if (isAuth) {
-    const userPermissions = req.cookies.get(PERMISSIONS_COOKIE)?.value
-    const permissions = userPermissions ? JSON.parse(userPermissions) : []
-    const page = pathname.split('/').pop() as TPages
-
-    if ($permissionsOnServer[page]) {
-      const hasPermissions = $checkPermissions(permissions, $permissionsOnServer[page])
-
-      if (!hasPermissions) {
-        return NextResponse.redirect(new URL('/dashboard', req.url))
-      }
-    }
-
-    return NextResponse.next()
+    return checkPermissionsOnServer(req, pathname)
   }
 
   if (!isExpired(accessToken)) {

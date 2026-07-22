@@ -31,7 +31,7 @@ export const $checkPermissions = (
   return false
 }
 
-export const $permissionsOnServer: Partial<Record<TPages, PermissionRequirement>> = {
+export const $permissionsOfPages: Partial<Record<TPages, PermissionRequirement>> = {
   about: {
     permission: 'edit_testing',
   },

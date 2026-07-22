@@ -1,14 +1,17 @@
 'use server'
 
 import {
+  $checkPermissions,
+  $permissionsOfPages,
   ACCESS_COOKIE,
   COOKIE_OPTIONS,
-  getCookie,
+  PAGES,
   PERMISSIONS_COOKIE,
   redirectToLogin,
   REFRESH_COOKIE,
   refreshToken,
   replaceCookie,
+  TPages,
 } from '@/lib/auth'
 import { NextRequest, NextResponse } from 'next/server'
 
@@ -39,7 +42,18 @@ export const checkCookiesBeforeRoute = async (req: NextRequest) => {
   }
 }
 
-export const permissions = async () => {
-  const permissions = await getCookie(PERMISSIONS_COOKIE)
-  return JSON.parse(permissions as string) as []
+export const checkPermissionsOnServer = async (req: NextRequest, pathname: string) => {
+  const userPermissions = req.cookies.get(PERMISSIONS_COOKIE)?.value
+  const permissions = userPermissions ? JSON.parse(userPermissions) : []
+  const page = pathname.split('/').pop() as TPages
+
+  if ($permissionsOfPages[page]) {
+    const hasPermissions = $checkPermissions(permissions, $permissionsOfPages[page])
+
+    if (!hasPermissions) {
+      return NextResponse.redirect(new URL(PAGES['dashboard'], req.url))
+    }
+  }
+
+  return NextResponse.next()
 }
