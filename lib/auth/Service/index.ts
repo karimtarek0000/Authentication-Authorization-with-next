@@ -14,6 +14,7 @@ import {
   userLogout,
   whenUserLogin,
 } from '@/lib/auth'
+import { authChannel } from '@/lib/auth/Provider'
 import { useCallback, useEffect, useState } from 'react'
 
 export const initialAuthState: AuthState = {
@@ -64,7 +65,10 @@ export const useAuthService = () => {
     }
   }
 
-  const logout = async () => await userLogout()
+  const logout = async () => {
+    authChannel.broadcast('logout')
+    await userLogout()
+  }
 
   const userProfile = useCallback(async () => {
     const hasAuth = await getCookie(HASAUTH_COOKIE)

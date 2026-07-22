@@ -1,7 +1,8 @@
 'use client'
 
-import { AuthActions, AuthProviderProps, useAuthService } from '@/lib/auth'
+import { AuthActions, AuthProviderProps } from '@/lib/auth'
 import { AuthActionsContext, AuthStateContext, Idle, SyncTabs } from '@/lib/auth/Provider'
+import { useAuthService } from '@/lib/auth/Service'
 import { useMemo } from 'react'
 
 export function AuthProvider({ children }: AuthProviderProps) {

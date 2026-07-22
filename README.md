@@ -1,6 +1,6 @@
 ## Authentication & Authorization Flow in Next
 
-Authentication and Authorization system flow for applications with next.js 15+.
+Authentication and Authorization system flow for applications with next.js 14+.
 
 ### Auth Structure `lib/auth/` in detail
 
@@ -70,7 +70,7 @@ to try hydrating a session without ever touching the tokens themselves.
 **Cookies** (all defined in [lib/auth/Config/index.ts](lib/auth/Config/index.ts)):
 
 | Cookie         | httpOnly | Purpose                                                           |
-| -------------- | -------- | ------------------------------------------------------------------ |
+| -------------- | -------- | ----------------------------------------------------------------- |
 | `accessToken`  | yes      | short-lived JWT sent to the API                                   |
 | `refreshToken` | yes      | long-lived token used to mint a new `accessToken`                 |
 | `permissions`  | yes      | JSON array of the user's permissions                              |
