@@ -8,7 +8,7 @@ import {
 
 const STATE_KEY_PREFIX = 'oauth_state_'
 
-const getOAuthRedirectURL = (provider: OAuthProvider) =>
+export const getOAuthRedirectURL = (provider: OAuthProvider) =>
   `${window.location.origin}/auth/callback/${provider}`
 
 const startOAuthLogin = (

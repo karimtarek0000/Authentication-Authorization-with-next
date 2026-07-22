@@ -4,9 +4,12 @@ import {
   AuthState,
   fetchClient,
   getCookie,
+  getOAuthRedirectURL,
   HASAUTH_COOKIE,
   ILogin,
   ILoginResponse,
+  OAUTH_PLATFORM,
+  OAuthProvider,
   PROFILE,
   userLogout,
   whenUserLogin,
@@ -46,6 +49,21 @@ export const useAuthService = () => {
     }
   }
 
+  const loginWithOAuth = async (provider: OAuthProvider, code: string) => {
+    try {
+      const endpoint = OAUTH_PLATFORM[provider]
+
+      const data = await fetchClient.post(endpoint, {
+        code,
+        redirectURL: getOAuthRedirectURL(provider),
+      })
+
+      setAuthData(data)
+    } catch (error) {
+      throw error
+    }
+  }
+
   const logout = async () => await userLogout()
 
   const userProfile = useCallback(async () => {
@@ -66,5 +84,5 @@ export const useAuthService = () => {
     profile()
   }, [userProfile])
 
-  return { login, logout, userAuth }
+  return { userAuth, login, logout, loginWithOAuth }
 }

@@ -12,9 +12,12 @@ import {
 import { useMemo } from 'react'
 
 export function AuthProvider({ children }: AuthProviderProps) {
-  const { login, logout, userAuth } = useAuthService()
+  const { login, logout, loginWithOAuth, userAuth } = useAuthService()
 
-  const actions = useMemo<AuthActions>(() => ({ login, logout }), [login, logout])
+  const actions = useMemo<AuthActions>(
+    () => ({ login, loginWithOAuth, logout }),
+    [login, loginWithOAuth, logout],
+  )
 
   return (
     <AuthStateContext.Provider value={userAuth}>
