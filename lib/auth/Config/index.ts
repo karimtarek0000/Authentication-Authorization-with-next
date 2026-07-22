@@ -1,4 +1,3 @@
-import { PermissionRequirement } from '@/lib/auth'
 import { ResponseCookie } from 'next/dist/compiled/@edge-runtime/cookies'
 
 export const LOGIN = '/auth-test'
