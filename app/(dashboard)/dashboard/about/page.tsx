@@ -1,7 +1,16 @@
+import { $checkPermissions, PAGES, permissions } from '@/lib/auth'
 import Link from 'next/link'
+import { redirect } from 'next/navigation'
 
 export default async function Page() {
-  // const profile = (await userProfile()).permissions
+  const permiss = await permissions()
+  const hasPermissions = $checkPermissions(permiss, {
+    permission: 'edit_testing',
+  })
+
+  if (!hasPermissions) {
+    return redirect(PAGES['dashboard'])
+  }
 
   return (
     <>
