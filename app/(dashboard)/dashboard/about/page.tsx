@@ -8,7 +8,7 @@ export default async function Page() {
       <Link href="/dashboard">Go to Dashboard Page</Link>
       <CanView
         permissionRequirement={{
-          permission: 'edit_testing',
+          permission: 'edit_profile',
         }}
       >
         <p>

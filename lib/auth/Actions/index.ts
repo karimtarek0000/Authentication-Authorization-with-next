@@ -1,2 +1,3 @@
-export * from './user'
+export * from './authService'
 export * from './cookies'
+export * from './user'

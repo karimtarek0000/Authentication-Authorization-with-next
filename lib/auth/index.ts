@@ -1,5 +1,4 @@
 export * from './Actions'
-export * from './Actions/authService'
 export * from './Call'
 export * from './Config'
 export * from './OAuth'
