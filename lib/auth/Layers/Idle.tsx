@@ -1,3 +1,5 @@
+'use client'
+
 import { useIdleTimeout } from '@/lib/auth'
 import { type ReactNode } from 'react'
 

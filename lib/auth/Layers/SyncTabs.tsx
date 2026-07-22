@@ -1,3 +1,5 @@
+'use client'
+
 import { authChannel } from '@/lib/auth'
 import { useEffect, type ReactNode } from 'react'
 

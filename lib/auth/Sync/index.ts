@@ -1,3 +1,5 @@
+'use client'
+
 import type { AuthEvent } from '@//lib/auth'
 
 const channel = new BroadcastChannel('auth')

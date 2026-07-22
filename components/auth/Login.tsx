@@ -1,6 +1,6 @@
 'use client'
 
-import { useAuthActions } from '@/lib/auth'
+import { startGithubLogin, startGoogleLogin, useAuthActions } from '@/lib/auth'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
@@ -66,7 +66,7 @@ export default function Login() {
         </button>
       </form>
 
-      {/* <div className="mt-6 space-y-3">
+      <div className="mt-6 space-y-3">
         <button
           type="button"
           onClick={startGoogleLogin}
@@ -82,7 +82,7 @@ export default function Login() {
         >
           <span className="font-medium">Continue with GitHub</span>
         </button>
-      </div> */}
+      </div>
     </div>
   )
 }

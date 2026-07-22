@@ -1,3 +1,5 @@
+'use client'
+
 import { useAuthActions, useAuthState } from '@/lib/auth'
 import { useEffect, useRef } from 'react'
 
