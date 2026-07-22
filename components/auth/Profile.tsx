@@ -1,6 +1,6 @@
 'use client'
 
-import { useAuthActions, useAuthState } from '@/lib/auth'
+import { useAuthActions, useAuthState } from '@/lib/auth/Provider'
 
 const Profile = () => {
   const { user, permissions } = useAuthState()
