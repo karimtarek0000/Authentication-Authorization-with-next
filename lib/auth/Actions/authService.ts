@@ -4,6 +4,7 @@ import {
   ACCESS_COOKIE,
   COOKIE_OPTIONS,
   getCookie,
+  PERMISSIONS_COOKIE,
   redirectToLogin,
   REFRESH_COOKIE,
   refreshToken,
@@ -39,6 +40,6 @@ export const checkCookiesBeforeRoute = async (req: NextRequest) => {
 }
 
 export const permissions = async () => {
-  const permissions = await getCookie('permissions')
+  const permissions = await getCookie(PERMISSIONS_COOKIE)
   return JSON.parse(permissions as string) as []
 }
