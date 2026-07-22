@@ -1,36 +1,155 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## Authentication & Authorization Flow in Next
 
-## Getting Started
+Authentication and Authorization system flow for applications with next.js 15+.
 
-First, run the development server:
+## Project Structure
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+```
+.
+├── app/
+│   ├── (auth)/
+│   │   └── auth/
+│   │       ├── page.tsx           # /auth — login page (renders Login)
+│   │       └── signup/
+│   │           └── page.tsx       # /auth/signup — placeholder
+│   ├── (dashboard)/
+│   │   └── dashboard/
+│   │       ├── page.tsx           # /dashboard — protected, server-fetches data + permissions
+│   │       └── about/
+│   │           └── page.tsx       # /dashboard/about — protected
+│   ├── components/                # (empty, reserved for shared UI)
+│   ├── layout.tsx                 # root layout, wraps the app in AuthProvider
+│   ├── page.tsx                   # / — default create-next-app page
+│   └── globals.css
+├── components/
+│   ├── auth/
+│   │   ├── Login.tsx               # client login form, calls useAuthActions().login
+│   │   └── Profile.tsx             # client component reading auth context + logout
+│   └── dashboard/
+│       └── Data.tsx                # client-side fetchClient example
+├── lib/
+│   └── auth/                       # all authentication logic (see below)
+├── proxy.ts                        # Next.js middleware (Next 16 renamed middleware.ts → proxy.ts)
+├── specs/
+│   └── 001-auth-flow/              # spec workspace (checklists/, contracts/)
+├── public/                         # static assets
+├── .env.local.example              # required env vars, copy to .env.local
+├── next.config.ts
+├── eslint.config.mjs
+└── tsconfig.json
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### `lib/auth/` in detail
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+lib/auth/
+├── index.ts                 # barrel re-exporting the whole module (import from '@/lib/auth')
+├── Types/index.ts            # AuthUser, ILogin, ILoginResponse, AuthState/Actions, Permission
+├── Config/index.ts           # endpoints, cookie names/options, PAGES routes
+├── Actions/
+│   ├── authService.ts        # 'use server': refreshToken, restoreSessionToken, checkCookiesBeforeRoute, permissions
+│   ├── cookies.ts            # 'use server': get/set/delete cookie primitives (next/headers)
+│   └── user.ts               # 'use server': whenUserLogin (sets cookies), userLogout (clears cookies + redirects)
+├── Call/
+│   ├── client.ts             # fetchClient — browser fetch wrapper, 401 refresh-and-retry, 5xx/429 retry
+│   └── server.ts             # 'server-only' fetchServer — RSC/server-side fetch using the access cookie
+├── Service/index.ts          # useAuthService hook: login/logout + hydrates profile on mount via GET /me
+├── Provider/
+│   ├── AuthProvider.tsx       # provides auth context, wraps children in SyncTabs + Idle
+│   ├── createContext.ts      # AuthStateContext / AuthActionsContext
+│   └── useAuthContext.tsx    # useAuthState / useAuthActions hooks
+├── Layers/
+│   ├── Idle.tsx               # mounts useIdleTimeout
+│   └── SyncTabs.tsx           # reloads the tab when another tab broadcasts 'logout'
+├── Idle/index.ts             # useIdleTimeout — logs out after 15 min of inactivity
+├── Sync/index.ts             # authChannel — BroadcastChannel('auth') for cross-tab events
+├── Permissions/index.ts      # $checkPermissions — evaluates {permission}/{anyOf}/{allOf} requirements
+├── Components/CanView.tsx    # permission-gated render helper (stub, not yet wired up)
+└── utils/index.ts            # 'server-only': isExpired (JWT exp check), replaceCookie, redirectToLogin
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Authentication Flow
 
-## Learn More
+### Features
 
-To learn more about Next.js, take a look at the following resources:
+- **Email/password login** with cookie-based sessions (`accessToken` + `refreshToken`, both httpOnly)
+- **Automatic access-token refresh** — both proactively in middleware (before an expired token ever
+  hits a route) and reactively on the client (401 → refresh → retry, deduped across concurrent requests)
+- **Protected routes via middleware** — `/dashboard/*` requires auth, `/auth/*` redirects away once
+  logged in, unauthenticated users are bounced to `/auth?backTo=<original path>`
+- **Session hydration on page load/refresh** — client React state is empty on a fresh load, so a
+  `hasAuth` flag cookie triggers a `GET /me` to repopulate it without ever exposing the tokens to JS
+- **Idle timeout** — auto logout after 15 minutes of no user activity
+- **Cross-tab logout sync** — logging out (or timing out) in one tab reloads/logs out every other
+  open tab via `BroadcastChannel`
+- **Permission-based access control** — `Permission` list per user plus a `$checkPermissions` helper
+  supporting single/`anyOf`/`allOf` requirement checks (the `CanView` render-guard component that
+  will consume it is scaffolded but not yet implemented)
+- **Separate client/server data-fetching helpers** — `fetchClient` for Client Components (cookie
+  auth, retry/refresh logic) and `fetchServer` for Server Components/RSCs (reads the cookie directly,
+  `server-only`)
+- **OAuth scaffolding (not implemented yet)** — Google/GitHub client IDs and authorize URLs are
+  defined in `Config/index.ts`, and the buttons exist commented-out in `Login.tsx`, but no callback
+  route or token exchange exists yet
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Auth state lives in two places at once: **httpOnly cookies** (source of truth, server-verifiable)
+and **React context** (`AuthProvider`, for client rendering). Nothing about the tokens is ever
+readable from client JS — only a plain `hasAuth` flag cookie is, so the client can know _whether_
+to try hydrating a session without ever touching the tokens themselves.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+**Cookies** (all defined in [lib/auth/Config/index.ts](lib/auth/Config/index.ts)):
 
-## Deploy on Vercel
+| Cookie         | httpOnly | Purpose                                                           |
+| -------------- | -------- | ----------------------------------------------------------------- |
+| `accessToken`  | yes      | short-lived JWT sent to the API                                   |
+| `refreshToken` | yes      | long-lived token used to mint a new `accessToken`                 |
+| `permissions`  | yes      | JSON array of the user's permissions                              |
+| `hasAuth`      | no       | plain `'true'` flag the client reads to decide whether to hydrate |
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+**1. Login** — [components/auth/Login.tsx](components/auth/Login.tsx) calls
+`useAuthActions().login()`, which (in
+[lib/auth/Service/index.ts](lib/auth/Service/index.ts)) `POST`s credentials to `/auth-test` via
+`fetchClient`. The API response sets the `accessToken`/`refreshToken` cookies (via
+`credentials: 'include'`); the app then calls the `whenUserLogin` server action
+([lib/auth/Actions/user.ts](lib/auth/Actions/user.ts)) to store `permissions` and flip `hasAuth`,
+and mirrors the response into React state.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+**2. Session hydration on load** — since React context resets on every full page load but cookies
+persist, `useAuthService` checks the `hasAuth` cookie on mount and, if set, calls `GET /me`
+(`fetchClient`) to repopulate `user`/`permissions`/`role` in context. If that call fails, it logs
+out.
+
+**3. Route protection (middleware)** — [proxy.ts](proxy.ts) matches `/dashboard/:path*` and
+`/auth/:path*`:
+
+- no `accessToken` + `refreshToken` pair → redirect to `/auth` (auth pages pass through)
+- authenticated user hitting `/auth` → redirect to `/dashboard` (or `?backTo=`)
+- `accessToken` still valid → continue
+- `accessToken` expired → call `restoreSessionToken`, which refreshes the token server-side and
+  forwards the request with the new cookie set; on failure, clears all auth cookies and redirects
+  to `/auth`
+
+**4. Token refresh (client requests)** — `fetchClient`
+([lib/auth/Call/client.ts](lib/auth/Call/client.ts)) retries once on a `401` by calling the shared
+`refreshOnce()` (deduped so concurrent 401s trigger a single `/refresh` call), then replays the
+original request; it also retries on `5xx`/`429`. Server Components instead use `fetchServer`
+([lib/auth/Call/server.ts](lib/auth/Call/server.ts)), which reads the `accessToken` cookie
+directly since there's no browser to hold it.
+
+**5. Logout** — `userLogout` ([lib/auth/Actions/user.ts](lib/auth/Actions/user.ts)) is a server
+action that deletes all four auth cookies and redirects to `/auth`. It's triggered by the idle
+timer or the "Logout" button in [components/auth/Profile.tsx](components/auth/Profile.tsx).
+
+**6. Idle timeout** — [lib/auth/Idle/index.ts](lib/auth/Idle/index.ts) logs the user out after 15
+minutes of no `keydown`/`click`/`scroll`/`touchstart`/`mousemove` activity (throttled to one reset
+per 2s), mounted app-wide via the `Idle` layer in `AuthProvider`.
+
+**7. Cross-tab sync** — [lib/auth/Sync/index.ts](lib/auth/Sync/index.ts) exposes a
+`BroadcastChannel('auth')` wrapper; the `SyncTabs` layer reloads the tab whenever a `'logout'`
+event arrives, so a logout in one tab is reflected everywhere.
+
+**8. Permissions** — `$checkPermissions`
+([lib/auth/Permissions/index.ts](lib/auth/Permissions/index.ts)) evaluates a
+`{ permission }` / `{ anyOf }` / `{ allOf }` requirement against the user's permission list.
+`CanView` ([lib/auth/Components/CanView.tsx](lib/auth/Components/CanView.tsx)) is meant to wrap
+that logic in a render-guard component but is currently a stub.
