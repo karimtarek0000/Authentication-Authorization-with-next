@@ -26,7 +26,7 @@ export const initialAuthState: AuthState = {
 export const useAuthService = () => {
   const [userAuth, setUserAuth] = useState<AuthState>(initialAuthState)
 
-  const setAuthData = (data: any) => {
+  const setAuthData = (data: ILoginResponse) => {
     const { id, name, permissions, role } = data
 
     setUserAuth({

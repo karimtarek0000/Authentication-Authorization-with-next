@@ -1,6 +1,6 @@
 'use client'
 
-import { consumeOAuthState, useAuthActions, type OAuthProvider } from '@/lib/auth'
+import { consumeOAuthState, type OAuthProvider } from '@/lib/auth'
 import Link from 'next/link'
 import { useParams, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
