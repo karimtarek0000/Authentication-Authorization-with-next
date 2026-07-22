@@ -25,6 +25,9 @@ export type AuthProviderProps = {
   children: ReactNode
 }
 
+// ================= OAUTH =================
+export type OAuthProvider = 'google' | 'github'
+
 export type AuthState = {
   user: AuthUser | null
   permissions: Permission[]
