@@ -31,8 +31,9 @@ export const $checkPermissions = (
   return false
 }
 
+// Add permissions for pages
 export const $permissionsOfPages: Partial<Record<TPages, PermissionRequirement>> = {
   about: {
-    permission: 'edit_testing',
+    permission: 'edit_profile',
   },
 }

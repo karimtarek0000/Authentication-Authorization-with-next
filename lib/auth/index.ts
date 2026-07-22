@@ -1,7 +1,6 @@
 export * from './Actions'
 export * from './Actions/authService'
 export * from './Call'
-export * from './Components/CanView'
 export * from './Config'
 export * from './OAuth'
 export * from './Permissions'
