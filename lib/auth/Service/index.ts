@@ -70,12 +70,12 @@ export const useAuthService = () => {
   const listenToLogout = () => {
     if (document.cookie.includes(`${SESSION_EXPIRED_COOKIE}=1`)) {
       document.cookie = `${SESSION_EXPIRED_COOKIE}=; path=/; max-age=0`
+      authChannel.broadcast('logout')
       location.reload()
     }
   }
 
   const logout = async () => {
-    authChannel.broadcast('logout')
     await userLogout()
   }
 
