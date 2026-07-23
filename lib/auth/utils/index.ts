@@ -47,5 +47,10 @@ export function redirectToLogin(req: NextRequest) {
   res.cookies.delete(PERMISSIONS_COOKIE)
   res.cookies.delete(HASAUTH_COOKIE)
 
+  res.cookies.set('sessionExpired', '1', {
+    path: '/',
+    maxAge: 30,
+    httpOnly: false,
+  })
   return res
 }

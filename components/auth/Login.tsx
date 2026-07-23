@@ -3,7 +3,7 @@
 import { startGithubLogin, startGoogleLogin } from '@/lib/auth'
 import { useAuthActions } from '@/lib/auth/Provider'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 export default function Login() {
   //   const searchParams = useSearchParams()
@@ -33,6 +33,13 @@ export default function Login() {
       setIsSubmitting(false)
     }
   }
+
+  useEffect(() => {
+    if (document.cookie.includes('sessionExpired=1')) {
+      document.cookie = 'sessionExpired=; path=/; max-age=0'
+      location.reload()
+    }
+  }, [])
 
   return (
     <div className="max-w-md mx-auto mt-20 p-6">
