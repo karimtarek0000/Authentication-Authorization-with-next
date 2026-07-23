@@ -75,9 +75,7 @@ export const useAuthService = () => {
     }
   }
 
-  const logout = async () => {
-    await userLogout()
-  }
+  const logout = async () => await userLogout()
 
   const userProfile = useCallback(async () => {
     const hasAuth = await getCookie(HASAUTH_COOKIE)
