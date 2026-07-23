@@ -18,28 +18,29 @@ lib/auth/
 │   ├── index.ts               # barrel: re-exports user.ts + cookies.ts (authService.ts is exported separately)
 │   ├── authService.ts        # 'use server': restoreSessionToken, checkCookiesBeforeRoute, permissions
 │   ├── cookies.ts            # 'use server': get/set/delete cookie primitives (next/headers)
-│   └── user.ts               # 'use server': whenUserLogin (sets cookies), userLogout (clears cookies + redirects)
+│   └── user.ts               # 'use server': whenUserLogin (sets cookies), userLogout (clears cookies, flags sessionExpired + redirects)
 ├── Call/
 │   ├── index.ts               # barrel: re-exports client.ts + refreshToken.ts + server.ts
-│   ├── client.ts             # fetchClient — browser fetch wrapper, 401 refresh-and-retry, 5xx/429 retry
+│   ├── client.ts             # fetchClient — browser fetch wrapper, 401 refresh-and-retry, 5xx/429 retry; abortPending() cancels in-flight requests via a shared AbortController
 │   ├── refreshToken.ts       # refreshToken — POSTs to the refresh endpoint (used by client + middleware)
 │   └── server.ts             # 'server-only' fetchServer — RSC/server-side fetch using the access cookie
 ├── OAuth/index.ts            # startGoogleLogin / startGithubLogin (PKCE-less state flow), consumeOAuthState, getOAuthRedirectURL
-├── Service/index.ts          # useAuthService hook: login/logout/loginWithOAuth + hydrates profile on mount via GET /me
+├── Service/index.ts          # useAuthService hook: login/logout/loginWithOAuth/listenToLogout + hydrates profile on mount via GET /me
 ├── Provider/
-│   ├── index.ts               # barrel: re-exports AuthProvider, contexts, hooks, Idle/SyncTabs layers, authChannel
-│   ├── AuthProvider.tsx       # provides auth context, wraps children in SyncTabs + Idle
+│   ├── index.ts               # barrel: re-exports AuthProvider, contexts, hooks, Idle/SyncTabs/AbortOnRouteChange layers, authChannel
+│   ├── AuthProvider.tsx       # provides auth context, wraps children in SyncTabs > Idle > AbortOnRouteChange
 │   ├── createContext.ts      # AuthStateContext / AuthActionsContext
 │   └── useAuthContext.tsx    # useAuthState / useAuthActions hooks
 ├── Layers/
-│   ├── index.ts               # barrel: re-exports Idle + SyncTabs
+│   ├── index.ts               # barrel: re-exports Idle + SyncTabs + AbortOnRouteChange
 │   ├── Idle.tsx               # mounts useIdleTimeout
-│   └── SyncTabs.tsx           # reloads the tab when another tab broadcasts 'logout'
+│   ├── SyncTabs.tsx           # reloads the tab when another tab broadcasts 'logout'
+│   └── AbortOnRouteChange.tsx # calls abortPending() on pathname change to cancel in-flight requests from the page being left
 ├── Idle/index.ts             # useIdleTimeout — logs out after 15 min of inactivity
 ├── Sync/index.ts             # authChannel — BroadcastChannel('auth') for cross-tab events
 ├── Permissions/index.ts      # $checkPermissions — evaluates {permission}/{anyOf}/{allOf} requirements
 ├── Components/CanView.tsx    # permission-gated render helper (stub, not yet wired up)
-└── utils/index.ts            # 'server-only': isExpired (JWT exp check), replaceCookie, redirectToLogin
+└── utils/index.ts            # 'server-only': isExpired (JWT exp check), replaceCookie, redirectToLogin (optionally flags sessionExpired)
 ```
 
 ## Features
@@ -60,8 +61,14 @@ lib/auth/
   on a fresh load, so a `hasAuth` flag cookie triggers a `GET /me` to
   repopulate it without ever exposing the tokens to JS.
 - **Idle timeout** — automatic logout after 15 minutes of no user activity.
-- **Cross-tab logout sync** — logging out (or timing out) in one tab
-  reloads/logs out every other open tab via `BroadcastChannel`.
+- **Cross-tab logout sync** — a forced logout (idle timeout or an expired
+  refresh token) sets a short-lived `sessionExpired` cookie; the login page
+  detects it, broadcasts `'logout'` on the shared `BroadcastChannel`, and
+  every other open tab reloads.
+- **Abort in-flight requests on route change** — `AbortOnRouteChange`
+  cancels any pending `fetchClient` calls (via `abortPending`) whenever the
+  pathname changes, so responses from a page the user has already left
+  don't land late.
 - **Permission-based access control** — a `Permission` list per user, plus a
   `$checkPermissions` helper supporting single/`anyOf`/`allOf` requirement
   checks. The `CanView` render-guard component that will consume it is
@@ -80,12 +87,13 @@ hydrating a session without ever touching the tokens themselves.
 
 All cookies are defined in `lib/auth/Config/index.ts`:
 
-| Cookie         | httpOnly | Purpose                                                           |
-| -------------- | -------- | ------------------------------------------------------------------ |
-| `accessToken`  | yes      | short-lived JWT sent to the API                                   |
-| `refreshToken` | yes      | long-lived token used to mint a new `accessToken`                 |
-| `permissions`  | yes      | JSON array of the user's permissions                              |
-| `hasAuth`      | no       | plain `'true'` flag the client reads to decide whether to hydrate |
+| Cookie           | httpOnly | Purpose                                                              |
+| ---------------- | -------- | ---------------------------------------------------------------------- |
+| `accessToken`    | yes      | short-lived JWT sent to the API                                      |
+| `refreshToken`   | yes      | long-lived token used to mint a new `accessToken`                    |
+| `permissions`    | yes      | JSON array of the user's permissions                                 |
+| `hasAuth`        | no       | plain `'true'` flag the client reads to decide whether to hydrate    |
+| `sessionExpired` | no       | short-lived (30s) flag set on forced logout/expiry, read once by the login page to trigger a cross-tab logout broadcast |
 
 ## Flow Walkthrough
 
@@ -128,7 +136,8 @@ The middleware matches `/dashboard/:path*` and `/auth/:path*`:
 - `accessToken` still valid → continue
 - `accessToken` expired → call `restoreSessionToken`, which refreshes the
   token server-side and forwards the request with the new cookie set; on
-  failure, clears all auth cookies and redirects to `/auth`
+  failure, clears all auth cookies, sets the `sessionExpired` cookie, and
+  redirects to `/auth`
 
 ### 5. Token refresh (client requests)
 
@@ -142,8 +151,11 @@ instead use `fetchServer` (`lib/auth/Call/server.ts`), which reads the
 ### 6. Logout
 
 `userLogout` (`lib/auth/Actions/user.ts`) is a server action that deletes
-all four auth cookies and redirects to `/auth`. It's triggered by the idle
-timer or the "Logout" button in the profile component.
+the four session cookies, sets a 30s `sessionExpired` cookie, and redirects
+to `/auth`. It's triggered by the idle timer or the "Logout" button in the
+profile component. Unlike the other auth actions, `logout()` no longer
+broadcasts on the `authChannel` itself — that happens when the login page
+picks up the `sessionExpired` cookie (see below).
 
 ### 7. Idle timeout
 
@@ -153,11 +165,24 @@ one reset per 2s), mounted app-wide via the `Idle` layer in `AuthProvider`.
 
 ### 8. Cross-tab sync
 
-`lib/auth/Sync/index.ts` exposes a `BroadcastChannel('auth')` wrapper; the
-`SyncTabs` layer reloads the tab whenever a `'logout'` event arrives, so a
-logout in one tab is reflected everywhere.
+`lib/auth/Sync/index.ts` exposes a `BroadcastChannel('auth')` wrapper.
+`listenToLogout` (`lib/auth/Service/index.ts`), called on mount from the
+login page, checks for the `sessionExpired` cookie; if present it clears
+the cookie, broadcasts `'logout'` on `authChannel`, and reloads. The
+`SyncTabs` layer subscribes on every tab and calls `location.reload()`
+whenever a `'logout'` event arrives, so a forced logout in one tab is
+reflected everywhere.
 
-### 9. Permissions
+### 9. Abort in-flight requests on route change
+
+`AbortOnRouteChange` (`lib/auth/Layers/AbortOnRouteChange.tsx`) watches the
+pathname via `usePathname`; on change it calls `abortPending`
+(`lib/auth/Call/client.ts`), which aborts the shared `AbortController` used
+by `fetchClient` and swaps in a fresh one, so requests started on a page
+the user has navigated away from are cancelled instead of resolving late.
+It's mounted innermost in `AuthProvider`, inside `SyncTabs` and `Idle`.
+
+### 10. Permissions
 
 `$checkPermissions` (`lib/auth/Permissions/index.ts`) evaluates a
 `{ permission }` / `{ anyOf }` / `{ allOf }` requirement against the user's
