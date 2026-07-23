@@ -7,6 +7,7 @@ import {
   PERMISSIONS_COOKIE,
   REFRESH_BUFFER,
   REFRESH_COOKIE,
+  SESSION_EXPIRED_COOKIE,
 } from '@/lib/auth'
 import { NextRequest, NextResponse } from 'next/server'
 
@@ -48,7 +49,7 @@ export function redirectToLogin(req: NextRequest, addCookie: boolean = false) {
   res.cookies.delete(HASAUTH_COOKIE)
 
   if (addCookie) {
-    res.cookies.set('sessionExpired', '1', {
+    res.cookies.set(SESSION_EXPIRED_COOKIE, '1', {
       path: '/',
       maxAge: 30,
       httpOnly: false,

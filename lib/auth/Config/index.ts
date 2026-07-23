@@ -21,6 +21,7 @@ export const ACCESS_COOKIE = 'accessToken'
 export const REFRESH_COOKIE = 'refreshToken'
 export const PERMISSIONS_COOKIE = 'permissions'
 export const HASAUTH_COOKIE = 'hasAuth'
+export const SESSION_EXPIRED_COOKIE = 'sessionExpired'
 export const COOKIE_OPTIONS: Partial<ResponseCookie> = {
   httpOnly: true,
   secure: process.env.NODE_ENV === 'production',

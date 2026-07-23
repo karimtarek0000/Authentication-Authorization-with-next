@@ -1,6 +1,6 @@
 'use client'
 
-import { startGithubLogin, startGoogleLogin } from '@/lib/auth'
+import { SESSION_EXPIRED_COOKIE, startGithubLogin, startGoogleLogin } from '@/lib/auth'
 import { useAuthActions } from '@/lib/auth/Provider'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -35,8 +35,8 @@ export default function Login() {
   }
 
   useEffect(() => {
-    if (document.cookie.includes('sessionExpired=1')) {
-      document.cookie = 'sessionExpired=; path=/; max-age=0'
+    if (document.cookie.includes(`${SESSION_EXPIRED_COOKIE}=1`)) {
+      document.cookie = `${SESSION_EXPIRED_COOKIE}=; path=/; max-age=0`
       location.reload()
     }
   }, [])
