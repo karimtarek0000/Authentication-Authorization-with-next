@@ -1,7 +1,7 @@
 'use client'
 
 import { AuthActions, AuthProviderProps } from '@/lib/auth'
-import { AuthActionsContext, AuthStateContext, Idle, SyncTabs } from '@/lib/auth/Provider'
+import { AbortOnRouteChange, AuthActionsContext, AuthStateContext, Idle, SyncTabs } from '@/lib/auth/Provider'
 import { useAuthService } from '@/lib/auth/Service'
 import { useMemo } from 'react'
 
@@ -19,7 +19,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
     <AuthStateContext.Provider value={userAuth}>
       <AuthActionsContext.Provider value={actions}>
         <SyncTabs>
-          <Idle>{children}</Idle>
+          <Idle>
+            <AbortOnRouteChange>{children}</AbortOnRouteChange>
+          </Idle>
         </SyncTabs>
       </AuthActionsContext.Provider>
     </AuthStateContext.Provider>
