@@ -28,7 +28,7 @@ export const restoreSessionToken = async (req: NextRequest, _refreshToken: strin
 
     return res
   } catch {
-    return redirectToLogin(req)
+    return redirectToLogin(req, true)
   }
 }
 

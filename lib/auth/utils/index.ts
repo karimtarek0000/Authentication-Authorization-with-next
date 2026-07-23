@@ -36,7 +36,7 @@ export function replaceCookie(header: string | null, name: string, value: string
     .join('; ')
 }
 
-export function redirectToLogin(req: NextRequest) {
+export function redirectToLogin(req: NextRequest, addCookie: boolean = false) {
   const url = new URL(PAGES['auth'], req.url)
   url.searchParams.set('backTo', req.nextUrl.pathname)
 
@@ -47,10 +47,13 @@ export function redirectToLogin(req: NextRequest) {
   res.cookies.delete(PERMISSIONS_COOKIE)
   res.cookies.delete(HASAUTH_COOKIE)
 
-  res.cookies.set('sessionExpired', '1', {
-    path: '/',
-    maxAge: 30,
-    httpOnly: false,
-  })
+  if (addCookie) {
+    res.cookies.set('sessionExpired', '1', {
+      path: '/',
+      maxAge: 30,
+      httpOnly: false,
+    })
+  }
+
   return res
 }
