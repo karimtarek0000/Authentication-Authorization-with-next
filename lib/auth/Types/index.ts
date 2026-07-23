@@ -40,6 +40,7 @@ export type AuthActions = {
   login: ({ email, password }: ILogin) => Promise<ILoginResponse>
   logout: () => Promise<void>
   loginWithOAuth: (provider: OAuthProvider, code: string) => Promise<void>
+  listenToLogout: VoidFunction
 }
 
 // ================= SYNC =================

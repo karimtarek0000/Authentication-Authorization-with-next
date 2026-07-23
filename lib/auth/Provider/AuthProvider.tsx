@@ -6,11 +6,11 @@ import { useAuthService } from '@/lib/auth/Service'
 import { useMemo } from 'react'
 
 export function AuthProvider({ children }: AuthProviderProps) {
-  const { login, logout, loginWithOAuth, userAuth, isLoading } = useAuthService()
+  const { login, logout, loginWithOAuth, userAuth, listenToLogout, isLoading } = useAuthService()
 
   const actions = useMemo<AuthActions>(
-    () => ({ login, loginWithOAuth, logout }),
-    [login, loginWithOAuth, logout],
+    () => ({ login, loginWithOAuth, listenToLogout, logout }),
+    [login, loginWithOAuth, logout, listenToLogout],
   )
 
   if (isLoading) return null

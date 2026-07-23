@@ -1,6 +1,6 @@
 'use client'
 
-import { SESSION_EXPIRED_COOKIE, startGithubLogin, startGoogleLogin } from '@/lib/auth'
+import { startGithubLogin, startGoogleLogin } from '@/lib/auth'
 import { useAuthActions } from '@/lib/auth/Provider'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -8,7 +8,7 @@ import { useEffect, useState } from 'react'
 export default function Login() {
   //   const searchParams = useSearchParams()
   const { replace } = useRouter()
-  const { login } = useAuthActions()
+  const { login, listenToLogout } = useAuthActions()
   const searchParams = useSearchParams()
 
   const [email, setEmail] = useState('karim@test.com')
@@ -35,11 +35,8 @@ export default function Login() {
   }
 
   useEffect(() => {
-    if (document.cookie.includes(`${SESSION_EXPIRED_COOKIE}=1`)) {
-      document.cookie = `${SESSION_EXPIRED_COOKIE}=; path=/; max-age=0`
-      location.reload()
-    }
-  }, [])
+    listenToLogout()
+  }, [listenToLogout])
 
   return (
     <div className="max-w-md mx-auto mt-20 p-6">

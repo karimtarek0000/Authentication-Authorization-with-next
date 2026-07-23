@@ -11,6 +11,7 @@ import {
   OAUTH_PLATFORM,
   OAuthProvider,
   PROFILE,
+  SESSION_EXPIRED_COOKIE,
   userLogout,
   whenUserLogin,
 } from '@/lib/auth'
@@ -66,9 +67,15 @@ export const useAuthService = () => {
     }
   }
 
+  const listenToLogout = () => {
+    if (document.cookie.includes(`${SESSION_EXPIRED_COOKIE}=1`)) {
+      document.cookie = `${SESSION_EXPIRED_COOKIE}=; path=/; max-age=0`
+      location.reload()
+    }
+  }
+
   const logout = async () => {
     authChannel.broadcast('logout')
-    setUserAuth(initialAuthState)
     await userLogout()
   }
 
@@ -95,15 +102,5 @@ export const useAuthService = () => {
     profile()
   }, [userProfile])
 
-  useEffect(() => {
-    const unsubscribe = authChannel.subscribe(event => {
-      if (event === 'logout') {
-        setUserAuth(initialAuthState)
-      }
-    })
-
-    return unsubscribe
-  }, [])
-
-  return { userAuth, login, logout, loginWithOAuth, isLoading }
+  return { userAuth, login, logout, loginWithOAuth, listenToLogout, isLoading }
 }
