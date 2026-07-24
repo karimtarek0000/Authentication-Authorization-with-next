@@ -56,7 +56,7 @@ export const useAuthService = () => {
     try {
       const endpoint = OAUTH_PLATFORM[provider]
 
-      const data = await fetchClient.post(endpoint, {
+      const data = await fetchClient.post<ILoginResponse>(endpoint, {
         code,
         redirectURL: getOAuthRedirectURL(provider),
       })

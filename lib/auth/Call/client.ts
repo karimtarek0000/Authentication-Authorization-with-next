@@ -1,4 +1,4 @@
-import { refreshToken } from '@/lib/auth'
+import { refreshToken, userLogout } from '@/lib/auth'
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL!
 
@@ -16,7 +16,7 @@ let refreshing: Promise<string | null> | null = null
 const refreshOnce = (): Promise<string | null> => {
   refreshing ??= refreshToken()
     .then(token => token ?? null)
-    .catch(() => null)
+    .catch(() => userLogout())
     .finally(() => {
       refreshing = null
     })
