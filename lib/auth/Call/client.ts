@@ -13,7 +13,7 @@ export const abortPending = () => {
 // ================ REFRESH_TOKEN ================
 let refreshTokenStatus: Promise<string | null> | null = null
 
-const refreshOnce = (): Promise<string | null> => {
+const refreshTokenHandler = (): Promise<string | null> => {
   if(refreshTokenStatus) return refreshTokenStatus
 
   refreshTokenStatus = (async () => {
@@ -32,12 +32,9 @@ const refreshOnce = (): Promise<string | null> => {
 }
 
 // ================ API_FETCH ================
-const isRetryable = (status: number) => status >= 500 || status === 429
-
 async function apiFetch<T>(
   path: string,
   opts: RequestInit = {},
-  retries = 2,
   failRetries = 2,
 ): Promise<T> {
   // const token = await getCookie(ACCESS_COOKIE)
@@ -53,23 +50,23 @@ async function apiFetch<T>(
     },
   })
 
-  if (res.status === 401 && retries > 0) {
-    const newToken = await refreshOnce()
-    if (newToken) return apiFetch<T>(path, opts, retries - 1, failRetries)
+  if (res.status === 401) {
+    const newToken = await refreshTokenHandler()
+    if (newToken) return apiFetch<T>(path, opts, failRetries)
   }
 
   if (!res.ok) {
-    if (isRetryable(res.status) && failRetries > 0) {
-      return apiFetch<T>(path, opts, retries, failRetries - 1)
+    if (res.status >= 500 && failRetries > 0) {
+      return apiFetch<T>(path, opts, failRetries - 1)
     }
 
     throw Object.assign(new Error(res.statusText), {
       status: res.status,
-      data: await res.json().catch(() => null),
+      data: await res.json().catch(() => null))?.message,
     })
   }
 
-  return res.status === 204 ? (null as T) : res.json()
+  return res.json()
 }
 
 // ================ METHODS ================
