@@ -2,7 +2,7 @@ import { REFRESH_TOKEN } from '@/lib/auth'
 
 export const refreshToken = async (refreshToken?: string) => {
   try {
-    const headers = refreshToken ? { Cookie: `refreshToken=${refreshToken}` } : undefined
+    const headers = refreshToken ? { Cookie: `refreshToken=${refreshToken}` } : null
 
     const response = await fetch(REFRESH_TOKEN, {
       method: 'POST',
