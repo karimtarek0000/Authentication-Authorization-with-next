@@ -35,14 +35,14 @@ const refreshTokenHandler = (): Promise<string | null> => {
 async function apiFetch<T>(
   path: string,
   opts: RequestInit = {},
-  failRetries = 2,
+  retries = 2,
 ): Promise<T> {
   // const token = await getCookie(ACCESS_COOKIE)
 
   const res = await fetch(BASE_URL + path, {
     ...opts,
     credentials: 'include',
-    signal: controller.signal,
+    signal: opts.signal ?? controller.signal,
     headers: {
       'Content-Type': 'application/json',
       // ...(token && { Authorization: `Bearer ${token}` }),
@@ -52,12 +52,12 @@ async function apiFetch<T>(
 
   if (res.status === 401) {
     const newToken = await refreshTokenHandler()
-    if (newToken) return apiFetch<T>(path, opts, failRetries)
+    if (newToken) return apiFetch<T>(path, opts, retries)
   }
 
   if (!res.ok) {
     if (res.status >= 500 && failRetries > 0) {
-      return apiFetch<T>(path, opts, failRetries - 1)
+      return apiFetch<T>(path, opts, retries - 1)
     }
 
     throw Object.assign(new Error(res.statusText), {
