@@ -11,17 +11,24 @@ export const abortPending = () => {
 }
 
 // ================ REFRESH_TOKEN ================
-let refreshing: Promise<string | null> | null = null
+let refreshTokenStatus: Promise<string | null> | null = null
 
 const refreshOnce = (): Promise<string | null> => {
-  refreshing ??= refreshToken()
-    .then(token => token ?? null)
-    .catch(() => userLogout())
-    .finally(() => {
-      refreshing = null
-    })
+  if(refreshTokenStatus) return refreshTokenStatus
 
-  return refreshing
+  refreshTokenStatus = (async () => {
+    try {
+     const token = await refreshToken()
+
+     return token
+    } catch {
+      userLogout()
+    } finally {
+      refreshTokenStatus = null
+    }
+  })()
+
+  return refreshTokenStatus
 }
 
 // ================ API_FETCH ================
