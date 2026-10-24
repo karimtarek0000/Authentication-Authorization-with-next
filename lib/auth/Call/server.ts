@@ -2,10 +2,12 @@
 
 import { ACCESS_COOKIE, getCookie } from '@/lib/auth'
 
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL!
+
 export async function fetchServer<T>(path: string, opts: RequestInit = { method: 'GET' }): Promise<T> {
   const accessToken = await getCookie(ACCESS_COOKIE)
 
-  const res = await fetch(process.env.NEXT_PUBLIC_API_URL + path, {
+  const res = await fetch(`${BASE_URL}${path}`, {
     ...opts,
     headers: {
       'Content-Type': 'application/json',
