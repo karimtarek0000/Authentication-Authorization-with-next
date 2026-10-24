@@ -39,7 +39,7 @@ async function apiFetch<T>(
 ): Promise<T> {
   // const token = await getCookie(ACCESS_COOKIE)
 
-  const res = await fetch(BASE_URL + path, {
+  const res = await fetch(`${BASE_URL}${path}`, {
     ...opts,
     credentials: 'include',
     signal: opts.signal ?? controller.signal,
